@@ -42,6 +42,8 @@ body, html {
 	.box{
 		margin-left:30px;
 		padding:5%;
+        position:fixed;
+        margin-top:40%;
 	}
 }
 
