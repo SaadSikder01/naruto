@@ -38,6 +38,12 @@ body, html {
     box-shadow:5px 5px 15px black;
 }
 
+@media(max-width:480px){
+	.box{
+		margin-left:30px;
+		padding:5%;
+	}
+}
 
 .submit{
 	height:30px;
