@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+/* পুরো পেজকে ঠিক করা */
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+/* ব্যাকগ্রাউন্ড ভিডিও */
+#bgVideo {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* ভিডিও পুরো স্ক্রিন ভরবে */
+    z-index: -1;       /* ভিডিও পিছনে থাকবে */
+}
+.box{
+    margin-left:550px;
+    margin-top:300px;
+    height:100px;
+    width:200px;
+
+    /* 🔥 শুধু এগুলো নতুন যোগ হলো */
+    background: rgba(255,255,255,0.2);  /* ট্রান্সপারেন্ট */
+    backdrop-filter:blur(5px);
+
+    padding:5%;
+    border-style:solid;
+    border-size:0.5px;
+    border-radius:20px;
+    border-color:black;
+    box-shadow:5px 5px 15px black;
+}
+
+
+.submit{
+	height:30px;
+	width:60px;
+	background-color:red;
+	border:solid 0.5px red;
+	border-radius:20px;
+	font-weight:bold;
+}
+.input{
+	height:25px;
+	width:200px;
+	border = solid black 0.5px;
+	border-radius:10px;
+	background-color: rgba(255,255,255,0.2);
+	backdrop-filter:blur(5px);
+}
+#soundBtn{
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(255,255,255,0.3);
+    backdrop-filter: blur(5px);
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 0 10px black;
+}
+
+</style>
+</head>
+
+<body>
+<audio id="bgMusic" autoplay muted loop>
+  <source src="music.mp3" type="audio/mpeg">
+</audio>
+
+<div id="soundBtn" onclick="toggleSound()">🔇</div>
+
+<div class = "box">
+<marquee direction = "scroll">
+একটি সঠিক ইউজার আইডি দিয়ে লগইন করুন। যদি ইউজার আইডি না থাকে তবে (saad@saad) লিখে লগইন করে রেজিস্ট্রেশ করুন।
+</marquee>
+<input type = "text" id = "input" class = "input" placeholder = "সঠিক ইউজার আইডি দিন">
+<br><br>
+<input type = "submit" value = "log in" id = "butn" onclick = "saad()" class = "submit">
+</div>
+<script>
+
+
+function toggleSound(){
+    let music = document.getElementById("bgMusic");
+    let btn = document.getElementById("soundBtn");
+
+    if(music.muted){
+        music.muted = false;
+        music.play();
+        btn.innerHTML = "🔊";  // Sound ON icon
+    } else {
+        music.muted = true;
+        btn.innerHTML = "🔇";  // Sound OFF icon
+    }
+}
+
+
+
+
+function saad(){
+const inpt = document.getElementById("input").value;
+if(inpt === "saad"){
+window.location.href = "second.html";
+}
+else if (inpt === "saad@saad"){
+window.location.href = "saad.html";
+}
+else{
+alert("ইউজার খুজে পাওয়া যাচ্ছে না! দয়া করে সঠিক তথ্য দিয়ে লগইন করুন।");
+}
+}
+</script>
+
+<!-- ব্যাকগ্রাউন্ড ভিডিও -->
+<video autoplay muted loop id="bgVideo">
+  <source src="naruto for bg.mp4" type="video/mp4">
+</video>
+
+
+
+</body>
+</html>
