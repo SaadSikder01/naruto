@@ -3,22 +3,22 @@
 <head>
 <meta name = "viewport" content = "width=device-width, initile-scale = 1.0">
 <style>
-/* পুরো পেজকে ঠিক করা */
+
 body, html {
     margin: 0;
     padding: 0;
     height: 100%;
 }
 
-/* ব্যাকগ্রাউন্ড ভিডিও */
+
 #bgVideo {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover; /* ভিডিও পুরো স্ক্রিন ভরবে */
-    z-index: -1;       /* ভিডিও পিছনে থাকবে */
+    object-fit: cover; 
+    z-index: -1;       
 }
 .box{
     margin-left:550px;
@@ -26,8 +26,8 @@ body, html {
     height:100px;
     width:200px;
 
-    /* 🔥 শুধু এগুলো নতুন যোগ হলো */
-    background: rgba(255,255,255,0.2);  /* ট্রান্সপারেন্ট */
+    
+    background: rgba(255,255,255,0.2);  
     backdrop-filter:blur(5px);
 
     padding:5%;
@@ -40,7 +40,7 @@ body, html {
 
 @media(max-width:480px){
 	.box{
-		margin-left:16%;
+		margin-left:15.5%;
 		padding:5%;
 		margin-top:40%;
 		position:fixed;
@@ -108,10 +108,10 @@ function toggleSound(){
     if(music.muted){
         music.muted = false;
         music.play();
-        btn.innerHTML = "🔊";  // Sound ON icon
+        btn.innerHTML = "🔊";  
     } else {
         music.muted = true;
-        btn.innerHTML = "🔇";  // Sound OFF icon
+        btn.innerHTML = "🔇";  
     }
 }
 
@@ -132,7 +132,7 @@ alert("ইউজার খুজে পাওয়া যাচ্ছে না! �
 }
 </script>
 
-<!-- ব্যাকগ্রাউন্ড ভিডিও -->
+
 <video autoplay muted loop id="bgVideo">
   <source src="naruto for bg.mp4" type="video/mp4">
 </video>
@@ -141,6 +141,7 @@ alert("ইউজার খুজে পাওয়া যাচ্ছে না! �
 
 </body>
 </html>
+
 
 
 
