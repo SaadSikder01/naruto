@@ -40,7 +40,7 @@ body, html {
 
 @media(max-width:480px){
 	.box{
-		margin-left:15.5%;
+		margin-left:16%;
 		padding:5%;
         position:fixed;
         margin-top:40%;
@@ -94,7 +94,7 @@ body, html {
 <marquee direction = "scroll">
 একটি সঠিক ইউজার আইডি দিয়ে লগইন করুন। যদি ইউজার আইডি না থাকে তবে (saad@saad) লিখে লগইন করে রেজিস্ট্রেশ করুন।
 </marquee>
-<input type = "text" id = "input" class = "input" placeholder = "সঠিক ইউজার আইডি দিন">
+<input type = "text" id = "input" class = "input" placeholder = "সঠিক ইউজার আইডি দিন" required>
 <br><br>
 <input type = "submit" value = "log in" id = "butn" onclick = "saad()" class = "submit">
 </div>
