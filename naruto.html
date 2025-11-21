@@ -1,21 +1,38 @@
 <!DOCTYPE html>
 <html>
 <head>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+button{
+border:0.5px solid black;
+border-radius:10px;
+height:100px;
+width:200px;
+font-weight:bold;
+background-color:green;
+}
+div{
+text-align:center;
+margin-top:20%;
+}
+button:active{
+background-color:blue;
+}
+</style>
+<title></title>
 </head>
-
 <body>
-
-    <h1 style = "text-align:center">ERROR!<span>404</span></h1>
-	<h1 class="server"></h1>
-<script src="https://unpkg.com/typed.js@2.1.0/dist/typed.umd.js"></script>
- <script>
-    var typed = new Typed('.server', {
-      strings: ["loading...","........","please wait until","server connect","to watch naruto"],
-      typeSpeed: 50,
-	  loop: true
-    });
-  </script>
-
+<div>
+<button onclick = "btn1()">CLICK HARE TO WATCH NARUTO</button><br><br>
+<button style = "background-color:red" onclick = "btn2()">CLICK HARE TO WATCH NARUTO SHIPPUDEN</button>
+<div>
+<script>
+function btn1(){
+window.location.href = "naruto1.html"
+}
+function btn2(){
+window.location.href = "naruto shippuden.html"
+}
+</script>
 </body>
 </html>
