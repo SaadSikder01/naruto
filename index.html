@@ -96,7 +96,7 @@ body, html {
 </marquee>
 <input type = "text" id = "input" class = "input" placeholder = "সঠিক ইউজার আইডি দিন" required>
 <br><br>
-<input type = "submit" value = "log in" id = "butn" onclick = "saad()" class = "submit">
+<input type = "submit" value = "log in" id = "butn" onclick="checkUser()" class = "submit">
 </div>
 <script>
 
@@ -118,22 +118,42 @@ function toggleSound(){
 
 
 
-function saad(){
-const inpt = document.getElementById("input").value;
-if(inpt === "saad"){
-window.location.href = "second.html";
-}
-else if (inpt === "saad@saad"){
-window.location.href = "https://www.facebook.com/Username.SaadSikder";
-}
-else if(inpt === "babu vai"){
-	window.location.href = "second.html";
-}
-else{
-alert("ইউজার খুজে পাওয়া যাচ্ছে না! দয়া করে সঠিক তথ্য দিয়ে লগইন করুন।");
-}
-}
-</script>
+
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDuSa23i_ULNTPLUyeaggSADrdfZ7sAsi0",
+    authDomain: "naruto-8bf54.firebaseapp.com",
+    projectId: "naruto-8bf54",
+    storageBucket: "naruto-8bf54.firebasestorage.app",
+    messagingSenderId: "182912319050",
+    appId: "1:182912319050:web:52eeb6a11ab344e40ef0b3"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  window.checkUser = async function (){
+    const inpt = document.getElementById("input").value.trim();
+
+    const docRef = doc(db, "data", "access key");
+    const docSnap = await getDoc(docRef);
+
+    if(docSnap.exists()){
+      let data = docSnap.data();
+
+      if(inpt in data){
+        window.location.href = "second.html";
+      } else {
+        alert("ইউজার খুঁজে পাওয়া যায়নি!");
+      }
+    }
+  }
+
+
 
 
 <video autoplay muted loop id="bgVideo">
@@ -144,7 +164,6 @@ alert("ইউজার খুজে পাওয়া যাচ্ছে না! �
 
 </body>
 </html>
-
 
 
 
