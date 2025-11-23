@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta name = "viewport" content = "width=device-width, initile-scale = 1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 
 body, html {
@@ -10,26 +10,24 @@ body, html {
     height: 100%;
 }
 
-
 #bgVideo {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover; 
-    z-index: -1;       
+    object-fit: cover;
+    z-index: -1;
 }
+
 .box{
     margin-left:550px;
     margin-top:300px;
     height:100px;
     width:200px;
     position:fixed;
-    
-    background: rgba(255,255,255,0.2);  
+    background: rgba(255,255,255,0.2);
     backdrop-filter:blur(5px);
-
     padding:5%;
     border-style:solid;
     border-size:0.5px;
@@ -58,11 +56,11 @@ body, html {
 .input{
 	height:25px;
 	width:200px;
-	border = solid black 0.5px;
 	border-radius:10px;
 	background-color: rgba(255,255,255,0.2);
 	backdrop-filter:blur(5px);
 }
+
 #soundBtn{
     position: fixed;
     top: 20px;
@@ -84,75 +82,113 @@ body, html {
 </head>
 
 <body>
+
+<!-- Background music -->
 <audio id="bgMusic" autoplay muted loop>
   <source src="music1.mp3" type="audio/mpeg">
 </audio>
 
+<!-- Sound toggle -->
 <div id="soundBtn" onclick="toggleSound()">🔇</div>
 
-<div class = "box">
-<marquee direction = "scroll">
+
+<!-- Login Box -->
+<div class="box">
+<marquee direction="scroll">
 একটি সঠিক ইউজার আইডি দিয়ে লগইন করুন। যদি ইউজার আইডি না থাকে তবে (saad@saad) লিখে লগইন করে রেজিস্ট্রেশ করুন।
 </marquee>
-<input type = "text" id = "input" class = "input" placeholder = "সঠিক ইউজার আইডি দিন" required>
+
+<input type="text" id="input" class="input" placeholder="সঠিক ইউজার আইডি দিন" required>
 <br><br>
-<input type = "submit" value = "log in" id = "butn" onclick = "saad()" class = "submit">
+<input type="submit" value="log in" id="butn" onclick="saad()" class="submit">
 </div>
-<script>
 
 
-function toggleSound(){
-    let music = document.getElementById("bgMusic");
-    let btn = document.getElementById("soundBtn");
-
-    if(music.muted){
-        music.muted = false;
-        music.play();
-        btn.innerHTML = "🔊";  
-    } else {
-        music.muted = true;
-        btn.innerHTML = "🔇";  
-    }
-}
-
-
-
-
-function saad(){
-const inpt = document.getElementById("input").value;
-if(inpt === "saad"){
-window.location.href = "second.html";
-}
-else if (inpt === "saad@saad"){
-window.location.href = "https://www.facebook.com/Username.SaadSikder";
-}
-else if(inpt === "babu vai"){
-	window.location.href = "second.html";
-}
-else{
-alert("ইউজার খুজে পাওয়া যাচ্ছে না! দয়া করে সঠিক তথ্য দিয়ে লগইন করুন।");
-}
-}
-</script>
-
-
+<!-- Background Video -->
 <video autoplay muted loop id="bgVideo">
   <source src="naruto for bg.mp4" type="video/mp4">
 </video>
 
 
 
+<!-- ========================= -->
+<!-- FIREBASE + LOGIN SCRIPT  -->
+<!-- ========================= -->
+<script type="module">
+
+// Firebase SDK import
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// তোমার Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyDuSa23i_ULNTPLUyeaggSADrdfZ7sAsi0",
+  authDomain: "naruto-8bf54.firebaseapp.com",
+  projectId: "naruto-8bf54",
+  storageBucket: "naruto-8bf54.firebasestorage.app",
+  messagingSenderId: "182912319050",
+  appId: "1:182912319050:web:52eeb6a11ab344e40ef0b3"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+
+//======================
+// SOUND BUTTON
+//======================
+window.toggleSound = function (){
+    let music = document.getElementById("bgMusic");
+    let btn = document.getElementById("soundBtn");
+
+    if(music.muted){
+        music.muted = false;
+        music.play();
+        btn.innerHTML = "🔊";
+    } else {
+        music.muted = true;
+        btn.innerHTML = "🔇";
+    }
+}
+
+
+//======================
+// LOGIN SYSTEM
+//======================
+window.saad = async function (){
+
+    const inpt = document.getElementById("input").value.trim();
+
+    // Firestore থেকে ডকুমেন্ট পড়া
+    const ref = doc(db, "data", "access key");
+    const snap = await getDoc(ref);
+
+    if(snap.exists()){
+
+        const data = snap.data();
+
+        // যদি ইউজার ফিল্ড Firestore-এ থাকে
+        if(inpt in data){
+            window.location.href = "second.html";
+        }
+
+        else if(inpt === "saad@saad"){
+            window.location.href = "https://www.facebook.com/Username.SaadSikder";
+        }
+
+        else {
+            alert("ইউজার খুজে পাওয়া যাচ্ছে না!");
+        }
+    }
+
+    else {
+        alert("Firestore database পাওয়া যাচ্ছে না!");
+    }
+
+}
+
+</script>
+
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
