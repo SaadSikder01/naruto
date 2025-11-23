@@ -2,8 +2,8 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style>
 
+<style>
 body, html {
     margin: 0;
     padding: 0;
@@ -30,7 +30,6 @@ body, html {
     backdrop-filter:blur(5px);
     padding:5%;
     border-style:solid;
-    border-size:0.5px;
     border-radius:20px;
     border-color:black;
     box-shadow:5px 5px 15px black;
@@ -41,7 +40,6 @@ body, html {
 		margin-left:16%;
 		padding:5%;
 		margin-top:40%;
-		position:fixed;
 	}
 }
 
@@ -53,6 +51,7 @@ body, html {
 	border-radius:20px;
 	font-weight:bold;
 }
+
 .input{
 	height:25px;
 	width:200px;
@@ -77,22 +76,17 @@ body, html {
     cursor: pointer;
     box-shadow: 0 0 10px black;
 }
-
 </style>
 </head>
 
 <body>
 
-<!-- Background music -->
 <audio id="bgMusic" autoplay muted loop>
   <source src="music1.mp3" type="audio/mpeg">
 </audio>
 
-<!-- Sound toggle -->
 <div id="soundBtn" onclick="toggleSound()">🔇</div>
 
-
-<!-- Login Box -->
 <div class="box">
 <marquee direction="scroll">
 একটি সঠিক ইউজার আইডি দিয়ে লগইন করুন। যদি ইউজার আইডি না থাকে তবে (saad@saad) লিখে লগইন করে রেজিস্ট্রেশ করুন।
@@ -103,24 +97,14 @@ body, html {
 <input type="submit" value="log in" id="butn" onclick="saad()" class="submit">
 </div>
 
-
-<!-- Background Video -->
-<video autoplay muted loop id="bgVideo">
-  <source src="naruto for bg.mp4" type="video/mp4">
-</video>
-
-
-
-<!-- ========================= -->
-<!-- FIREBASE + LOGIN SCRIPT  -->
-<!-- ========================= -->
+<!-- 🔥 FIREBASE LOGIN SCRIPT -->
 <script type="module">
 
-// Firebase SDK import
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+// Firebase imports
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// তোমার Firebase config
+// Your Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyDuSa23i_ULNTPLUyeaggSADrdfZ7sAsi0",
   authDomain: "naruto-8bf54.firebaseapp.com",
@@ -134,61 +118,55 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-
-//======================
-// SOUND BUTTON
-//======================
-window.toggleSound = function (){
+// SOUND TOGGLE
+window.toggleSound = function(){
     let music = document.getElementById("bgMusic");
     let btn = document.getElementById("soundBtn");
 
     if(music.muted){
         music.muted = false;
-        music.play();
         btn.innerHTML = "🔊";
     } else {
         music.muted = true;
         btn.innerHTML = "🔇";
     }
-}
+};
 
-
-//======================
-// LOGIN SYSTEM
-//======================
-window.saad = async function (){
+// 🔥 LOGIN FUNCTION WITH FIRESTORE
+window.saad = async function () {
 
     const inpt = document.getElementById("input").value.trim();
 
-    // Firestore থেকে ডকুমেন্ট পড়া
+    // ফেসবুক রেজিস্ট্রেশন লিঙ্ক
+    if(inpt === "saad@saad"){
+        window.location.href = "https://www.facebook.com/Username.SaadSikder";
+        return;
+    }
+
+    // Firestore থেকে ডেটা আনা
     const ref = doc(db, "data", "access key");
     const snap = await getDoc(ref);
 
     if(snap.exists()){
-
         const data = snap.data();
 
-        // যদি ইউজার ফিল্ড Firestore-এ থাকে
+        // যদি Firestore এ ইনপুট নামটি থাকে
         if(inpt in data){
             window.location.href = "second.html";
-        }
-
-        else if(inpt === "saad@saad"){
-            window.location.href = "https://www.facebook.com/Username.SaadSikder";
-        }
-
-        else {
-            alert("ইউজার খুজে পাওয়া যাচ্ছে না!");
+        } else {
+            alert("ইউজার খুঁজে পাওয়া যাচ্ছে না!");
         }
     }
-
     else {
-        alert("Firestore database পাওয়া যাচ্ছে না!");
+        alert("Database পাওয়া যাচ্ছে না! Firestore ঠিক আছে কিনা দেখুন।");
     }
-
-}
+};
 
 </script>
+
+<video autoplay muted loop id="bgVideo">
+  <source src="naruto for bg.mp4" type="video/mp4">
+</video>
 
 </body>
 </html>
