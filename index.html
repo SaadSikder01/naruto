@@ -1,126 +1,146 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secret Login</title>
-    <style>
-        body, html {margin:0;padding:0;height:100%;overflow:hidden;background:#000;font-family:sans-serif;}
-        #bgVideo {position:fixed;top:50%;left:50%;min-width:100%;min-height:100%;width:auto;height:auto;z-index:-1;transform:translateX(-50%) translateY(-50%);}
-        .box {
-            position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-            width:340px;padding:40px 30px;background:rgba(0,0,0,0.6);backdrop-filter:blur(15px);
-            border-radius:25px;text-align:center;color:white;box-shadow:0 0 40px rgba(255,0,0,0.6);
-            border:2px solid rgba(255,255,255,0.1);
-        }
-        marquee {color:#ff4444;font-weight:bold;font-size:15px;margin-bottom:20px;}
-        input {width:90%;padding:16px;margin:12px 0;border:none;border-radius:12px;background:rgba(255,255,255,0.2);color:white;font-size:17px;outline:none;}
-        input::placeholder {color:rgba(255,255,255,0.7);}
-        button {padding:14px 50px;background:#ff2d2d;border:none;border-radius:30px;color:white;font-weight:bold;font-size:17px;cursor:pointer;margin-top:10px;}
-        button:hover {background:#cc0000;}
-        #msg {color:#ff6b6b;margin-top:15px;font-weight:bold;}
-        #soundBtn {
-            position:fixed;top:20px;right:20px;width:55px;height:55px;background:rgba(255,255,255,0.3);
-            backdrop-filter:blur(10px);border-radius:50%;display:flex;justify-content:center;align-items:center;
-            font-size:30px;cursor:pointer;z-index:999;box-shadow:0 0 20px rgba(0,0,0,0.7);
-        }
-        @media(max-width:480px){.box{width:90%;}}
-    </style>
+<meta name = "viewport" content = "width=device-width, initile-scale = 1.0">
+<style>
+
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+
+#bgVideo {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+    z-index: -1;       
+}
+.box{
+    margin-left:550px;
+    margin-top:300px;
+    height:100px;
+    width:200px;
+    position:fixed;
+    
+    background: rgba(255,255,255,0.2);  
+    backdrop-filter:blur(5px);
+
+    padding:5%;
+    border-style:solid;
+    border-size:0.5px;
+    border-radius:20px;
+    border-color:black;
+    box-shadow:5px 5px 15px black;
+}
+
+@media(max-width:480px){
+	.box{
+		margin-left:16%;
+		padding:5%;
+		margin-top:40%;
+		position:fixed;
+	}
+}
+
+.submit{
+	height:30px;
+	width:60px;
+	background-color:red;
+	border:solid 0.5px red;
+	border-radius:20px;
+	font-weight:bold;
+}
+.input{
+	height:25px;
+	width:200px;
+	border = solid black 0.5px;
+	border-radius:10px;
+	background-color: rgba(255,255,255,0.2);
+	backdrop-filter:blur(5px);
+}
+#soundBtn{
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(255,255,255,0.3);
+    backdrop-filter: blur(5px);
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 0 10px black;
+}
+
+</style>
 </head>
+
 <body>
+<audio id="bgMusic" autoplay muted loop>
+  <source src="music1.mp3" type="audio/mpeg">
+</audio>
+
+<div id="soundBtn" onclick="toggleSound()">🔇</div>
+
+<div class = "box">
+<marquee direction = "scroll">
+একটি সঠিক ইউজার আইডি দিয়ে লগইন করুন। যদি ইউজার আইডি না থাকে তবে (saad@saad) লিখে লগইন করে রেজিস্ট্রেশ করুন।
+</marquee>
+<input type = "text" id = "input" class = "input" placeholder = "সঠিক ইউজার আইডি দিন" required>
+<br><br>
+<input type = "submit" value = "log in" id = "butn" onclick = "saad()" class = "submit">
+</div>
+<script>
+
+
+function toggleSound(){
+    let music = document.getElementById("bgMusic");
+    let btn = document.getElementById("soundBtn");
+
+    if(music.muted){
+        music.muted = false;
+        music.play();
+        btn.innerHTML = "🔊";  
+    } else {
+        music.muted = true;
+        btn.innerHTML = "🔇";  
+    }
+}
+
+
+
+
+function saad(){
+const inpt = document.getElementById("input").value;
+if(inpt === "saad"){
+window.location.href = "second.html";
+}
+else if (inpt === "saad@saad"){
+window.location.href = "https://www.facebook.com/Username.SaadSikder";
+}
+else if(inpt === "babu vai"){
+	window.location.href = "second.html";
+}
+else{
+alert("ইউজার খুজে পাওয়া যাচ্ছে না! দয়া করে সঠিক তথ্য দিয়ে লগইন করুন।");
+}
+}
+</script>
+
 
 <video autoplay muted loop id="bgVideo">
-    <source src="naruto for bg.mp4" type="video/mp4">
+  <source src="naruto for bg.mp4" type="video/mp4">
 </video>
 
-<audio id="bgMusic" loop>
-    <source src="music1.mp3" type="audio/mpeg">
-</audio>
-<div id="soundBtn" onclick="toggleSound()">Mute</div>
 
-<div class="box">
-    <marquee direction="left" behavior="scroll" scrollamount="6">
-        একটি সঠিক ইউজার আইডি দিয়ে লগইন করুন...
-    </marquee>
-    <input type="text" id="username" placeholder="ইউজার আইডি লিখুন" autocomplete="off">
-    <br><br>
-    <button onclick="checkLogin()">লগইন করুন</button>
-    <p id="msg"></p>
-</div>
-
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
-
-    // তোমার ফায়ারবেস কনফিগ (একদম ঠিক আছে)
-    const firebaseConfig = {
-        apiKey: "AIzaSyDxSxER2cNYYJvNKw0W8cQ4FyaJzUYX9jo",
-        authDomain: "naruto-8c41e.firebaseapp.com",
-        projectId: "naruto-8c41e",
-        storageBucket: "naruto-8c41e.firebasestorage.app",
-        messagingSenderId: "281170649482",
-        appId: "1:281170649482:web:826ed529fa6c0ec7ae6873"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    // লগইন চেক ফাংশন
-    window.checkLogin = async function() {
-        const username = document.getElementById("username").value.trim().toLowerCase();
-        const msg = document.getElementById("msg");
-
-        if (!username) {
-            msg.innerText = "ইউজারনেম লিখুন!";
-            return;
-        }
-
-        msg.innerHTML = "চেক করা হচ্ছে...";
-
-        try {
-            // Collection: server → Document: data → Field: saad
-            const docRef = doc(db, "server", "data");
-            const docSnap = await getDoc(docRef);
-
-            if (docSnap.exists()) {
-                const data = docSnap.data();
-
-                // যদি saad ফিল্ডে কোনো ভ্যালু থাকে এবং ইউজার লেখে "saad"
-                if (data.saad !== undefined && username === "saad") {
-                    window.location.href = "second.html"; // তোমার মূল পেজ
-                }
-                // যদি আরও ইউজার যোগ করতে চাও (উদাহরণ)
-                else if (data["babu vai"] !== undefined && username === "babu vai") {
-                    window.location.href = "second.html";
-                }
-                else if (data["saad@saad"] !== undefined && username === "saad@saad") {
-                    window.location.href = "https://www.facebook.com/Username.SaadSikder";
-                }
-                else {
-                    msg.innerText = "ভুল ইউজারনেম!";
-                }
-            } else {
-                msg.innerText = "ডাটা পাওয়া যায়নি!";
-            }
-        } catch (err) {
-            msg.innerText = "ইন্টারনেট সমস্যা!";
-            console.error(err);
-        }
-    };
-
-    // সাউন্ড টগল
-    window.toggleSound = function() {
-        const music = document.getElementById("bgMusic");
-        const btn = document.getElementById("soundBtn");
-        if (music.paused) {
-            music.play();
-            btn.innerHTML = "On";
-        } else {
-            music.pause();
-            btn.innerHTML = "Mute";
-        }
-    };
-</script>
 
 </body>
 </html>
