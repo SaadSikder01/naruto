@@ -3,57 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>পোস্ট গ্যালারি</title>
+    <title>সকল পোস্ট</title>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background:#000; color:#fff; }
+        body { background: #0d0d0d; color: #fff; }
+        .post-card { background: #1a1a1a; border-radius: 10px; padding: 10px; margin-bottom: 18px; border: 1px solid #333; }
+        .post-img, .post-vid { width: 100%; border-radius: 10px; }
+        .time { font-size: 10px; color: #aaa; margin-top: 5px; }
     </style>
 </head>
 
 <body>
 
-<div class="container py-5">
-    <h1 class="text-center mb-5 display-3 text-warning">সব পোস্ট</h1>
+<div class="container py-4">
+    <h2 class="text-center text-warning mb-3">সকল পোস্ট</h2>
 
-    <div class="text-center mb-4">
-        <a href="index.html" class="btn btn-success btn-lg">নতুন পোস্ট করো</a>
+    <div id="posts"></div>
+
+    <div class="mt-3 text-center">
+        <a href="index.html" class="btn btn-secondary">নতুন পোস্ট করো</a>
     </div>
-
-    <div id="gallery" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4"></div>
-    <div class="text-center py-5" id="empty"><h2>এখনো কোনো পোস্ট নেই</h2></div>
 </div>
 
 <script>
-function load(){
-    const posts = JSON.parse(localStorage.getItem("realPosts") || "[]");
-    const gallery = document.getElementById('gallery');
-
-    gallery.innerHTML = "";
+function loadPosts() {
+    const posts = JSON.parse(localStorage.getItem("allPosts") || "[]");
+    const box = document.getElementById("posts");
 
     if (posts.length === 0) {
-        document.getElementById('empty').style.display = "block";
+        box.innerHTML = `<p class="text-center text-muted">কোনো পোস্ট নেই</p>`;
         return;
     }
 
-    document.getElementById('empty').style.display = "none";
-
-    posts.forEach(p => {
-        const media = p.type === "video"
-            ? `<video src="${p.url}" controls class="w-100 rounded"></video>`
-            : `<img src="${p.url}" class="w-100 rounded">`;
-
-        gallery.innerHTML += `
-            <div class="col">
-                <div class="bg-dark p-3 rounded">
-                    ${media}
-                    <p class="mt-2">${p.caption}</p>
-                    <small>${p.time}</small>
-                </div>
-            </div>`;
-    });
+    box.innerHTML = posts.map(p => `
+        <div class="post-card">
+            ${p.type === "video"
+                ? `<video src="${p.url}" class="post-vid" controls></video>`
+                : `<img src="${p.url}" class="post-img">`
+            }
+            <p class="mt-2">${p.caption || ""}</p>
+            <p class="time">${p.time}</p>
+        </div>
+    `).join("");
 }
 
-load();
+loadPosts();
 </script>
 
 </body>
