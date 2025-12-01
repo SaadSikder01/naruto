@@ -4,78 +4,71 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>নতুন পোস্ট</title>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background: #000; color: #fff; }
+        body { background: #111; color: #fff; }
+        .container { max-width: 600px; }
+        .card { background: #1b1b1b; border: 1px solid #333; }
+        .preview-media { width: 100%; border-radius: 10px; margin-top: 10px; }
     </style>
 </head>
 
 <body>
-<div class="container py-5">
-    <h1 class="text-center mb-4 display-4 text-warning">নতুন পোস্ট করো</h1>
+<div class="container py-4">
+    <h2 class="text-center text-warning mb-4">নতুন পোস্ট তৈরি করো</h2>
 
-    <div class="card bg-dark mx-auto" style="max-width:600px">
-        <div class="card-body">
+    <div class="card p-3">
+        <form id="uploadForm">
+            <label class="form-label">ছবি বা ভিডিও নির্বাচন করো</label>
+            <input type="file" id="file" class="form-control" accept="image/*,video/*" required>
 
-            <form id="uploadForm">
-                <div class="mb-3">
-                    <label class="form-label">ছবি বা ভিডিও নির্বাচন করো</label>
-                    <input type="file" id="file" class="form-control" accept="image/*,video/*" required>
-                </div>
+            <label class="form-label mt-3">ক্যাপশন</label>
+            <textarea id="caption" class="form-control bg-dark text-light" rows="3"
+                placeholder="Caption লিখো..."></textarea>
 
-                <div class="mb-3">
-                    <label class="form-label">ক্যাপশন (ঐচ্ছিক)</label>
-                    <textarea id="caption" class="form-control bg-secondary text-white" rows="3"
-                        placeholder="কিছু লিখো..."></textarea>
-                </div>
+            <button class="btn btn-warning w-100 mt-3" type="submit">
+                <span id="btnText">পোস্ট করো</span>
+                <span id="loading" class="spinner-border spinner-border-sm d-none"></span>
+            </button>
+        </form>
 
-                <button type="submit" class="btn btn-warning btn-lg w-100">
-                    <span id="btnText">পোস্ট করো</span>
-                    <span id="loading" class="spinner-border spinner-border-sm d-none"></span>
-                </button>
-            </form>
-
-            <div id="preview" class="mt-4 text-center"></div>
-        </div>
+        <div id="preview" class="mt-3 text-center"></div>
     </div>
 
-    <div class="text-center mt-4">
-        <a href="moreep.html" class="btn btn-danger btn-lg">পোস্টগুলো দেখো</a>
+    <div class="text-center mt-3">
+        <a href="moreep.html" class="btn btn-danger w-100">পোস্টগুলো দেখো</a>
     </div>
 </div>
 
-
 <script>
-// ========= YOUR API KEY HERE =========
-const API_KEY = "bc6fa6c71edf94577f6ef7832f901e96";
-// =====================================
+const API_KEY = "bc6fa6c71edf94577f6ef7832f901e96";  // ← এখানে তোমার API key বসাবে
 
+// Preview
+document.getElementById("file").onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-// Preview Before Upload
-document.getElementById('file').onchange = e => {
-    const f = e.target.files[0];
-    if (f) {
-        const u = URL.createObjectURL(f);
-        document.getElementById('preview').innerHTML =
-            f.type.startsWith('video')
-                ? `<video src="${u}" controls class="img-fluid rounded"></video>`
-                : `<img src="${u}" class="img-fluid rounded">`;
-    }
+    const url = URL.createObjectURL(file);
+    document.getElementById("preview").innerHTML =
+        file.type.startsWith("video")
+            ? `<video src="${url}" class="preview-media" controls></video>`
+            : `<img src="${url}" class="preview-media">`;
 };
 
-
-// Upload Function
-document.getElementById('uploadForm').onsubmit = async e => {
+// Upload & Save
+document.getElementById("uploadForm").onsubmit = async e => {
     e.preventDefault();
 
-    const file = document.getElementById('file').files[0];
-    const caption = document.getElementById('caption').value.trim() || " ";
-    const btnText = document.getElementById('btnText');
-    const loading = document.getElementById('loading');
+    const file = document.getElementById("file").files[0];
+    const caption = document.getElementById("caption").value.trim();
+    const btnText = document.getElementById("btnText");
+    const loading = document.getElementById("loading");
 
     btnText.classList.add("d-none");
     loading.classList.remove("d-none");
 
+    // upload to imgbb
     const fd = new FormData();
     fd.append("image", file);
 
@@ -90,20 +83,20 @@ document.getElementById('uploadForm').onsubmit = async e => {
         const post = {
             url: json.data.url,
             caption: caption,
-            time: new Date().toLocaleString('bn-BD'),
-            type: file.type.startsWith("video") ? "video" : "image"
+            type: file.type.startsWith("video") ? "video" : "image",
+            time: new Date().toLocaleString("bn-BD")
         };
 
-        let posts = JSON.parse(localStorage.getItem("realPosts") || "[]");
-        posts.unshift(post);
-        localStorage.setItem("realPosts", JSON.stringify(posts));
+        let all = JSON.parse(localStorage.getItem("allPosts") || "[]");
+        all.unshift(post);
+        localStorage.setItem("allPosts", JSON.stringify(all));
 
-        alert("✔ পোস্ট হয়ে গেছে!");
+        alert("✔ পোস্ট সফলভাবে আপলোড হয়েছে!");
 
         e.target.reset();
-        document.getElementById('preview').innerHTML = "";
+        document.getElementById("preview").innerHTML = "";
     } else {
-        alert("❌ আপলোড হয়নি! API Key সঠিক কিনা চেক করো।");
+        alert("❌ পোস্ট আপলোডে সমস্যা হয়েছে!");
     }
 
     btnText.classList.remove("d-none");
