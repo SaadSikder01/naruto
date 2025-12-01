@@ -40,15 +40,15 @@
     </div>
 
     <div class="text-center mt-4">
-        <a href="gallery.html" class="btn btn-danger btn-lg">গ্যালারি দেখো</a>
+        <a href="mreepp.html" class="btn btn-danger btn-lg">পোস্টগুলো দেখো</a>
     </div>
 </div>
 
 
 <script>
-// ========= YOUR API KEY SET HERE =========
-const API_KEY = "YOUR_IMGBB_API_KEY";
-// ==========================================
+// ========= IMPORTANT: YOUR API KEY HERE =========
+const API_KEY = "YOUR_API_KEY";
+// ================================================
 
 
 // Preview Image/Video Before Upload
@@ -103,12 +103,13 @@ document.getElementById('uploadForm').onsubmit = async e => {
         e.target.reset();
         document.getElementById('preview').innerHTML = "";
     } else {
-        alert("❌ আপলোড হয়নি। API Key চেক করুন!");
+        alert("❌ আপলোড হয়নি! API Key সঠিক কিনা চেক করো।");
     }
 
     btnText.classList.remove("d-none");
     loading.classList.add("d-none");
 };
 </script>
+
 </body>
 </html>
