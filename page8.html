@@ -1,107 +1,50 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>নতুন পোস্ট</title>
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body { background: #111; color: #fff; }
-        .container { max-width: 600px; }
-        .card { background: #1b1b1b; border: 1px solid #333; }
-        .preview-media { width: 100%; border-radius: 10px; margin-top: 10px; }
-    </style>
+  <title>Upload Video</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-<div class="container py-4">
-    <h2 class="text-center text-warning mb-4">নতুন পোস্ট তৈরি করো</h2>
 
-    <div class="card p-3">
-        <form id="uploadForm">
-            <label class="form-label">ছবি বা ভিডিও নির্বাচন করো</label>
-            <input type="file" id="file" class="form-control" accept="image/*,video/*" required>
+<div class="box">
+  <h2>Upload Your Video</h2>
 
-            <label class="form-label mt-3">ক্যাপশন</label>
-            <textarea id="caption" class="form-control bg-dark text-light" rows="3"
-                placeholder="Caption লিখো..."></textarea>
+  <input type="file" id="videoFile" accept="video/*">
+  <button onclick="uploadVideo()">Upload</button>
 
-            <button class="btn btn-warning w-100 mt-3" type="submit">
-                <span id="btnText">পোস্ট করো</span>
-                <span id="loading" class="spinner-border spinner-border-sm d-none"></span>
-            </button>
-        </form>
+  <p id="status"></p>
 
-        <div id="preview" class="mt-3 text-center"></div>
-    </div>
-
-    <div class="text-center mt-3">
-        <a href="moreep.html" class="btn btn-danger w-100">পোস্টগুলো দেখো</a>
-    </div>
+  <a href="moreep.html">See All Videos</a>
 </div>
 
-<script>
-const API_KEY = "bc6fa6c71edf94577f6ef7832f901e96";  // ← এখানে তোমার API key বসাবে
+<script type="module">
+  import { app } from "./firebase.js";
+  import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-storage.js";
+  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
 
-// Preview
-document.getElementById("file").onchange = e => {
-    const file = e.target.files[0];
-    if (!file) return;
+  const storage = getStorage(app);
+  const db = getFirestore(app);
 
-    const url = URL.createObjectURL(file);
-    document.getElementById("preview").innerHTML =
-        file.type.startsWith("video")
-            ? `<video src="${url}" class="preview-media" controls></video>`
-            : `<img src="${url}" class="preview-media">`;
-};
+  async function uploadVideo() {
+    const status = document.getElementById("status");
+    const file = document.getElementById("videoFile").files[0];
 
-// Upload & Save
-document.getElementById("uploadForm").onsubmit = async e => {
-    e.preventDefault();
-
-    const file = document.getElementById("file").files[0];
-    const caption = document.getElementById("caption").value.trim();
-    const btnText = document.getElementById("btnText");
-    const loading = document.getElementById("loading");
-
-    btnText.classList.add("d-none");
-    loading.classList.remove("d-none");
-
-    // upload to imgbb
-    const fd = new FormData();
-    fd.append("image", file);
-
-    const res = await fetch(`https://api.imgbb.com/1/upload?key=${API_KEY}`, {
-        method: "POST",
-        body: fd
-    });
-
-    const json = await res.json();
-
-    if (json.success) {
-        const post = {
-            url: json.data.url,
-            caption: caption,
-            type: file.type.startsWith("video") ? "video" : "image",
-            time: new Date().toLocaleString("bn-BD")
-        };
-
-        let all = JSON.parse(localStorage.getItem("allPosts") || "[]");
-        all.unshift(post);
-        localStorage.setItem("allPosts", JSON.stringify(all));
-
-        alert("✔ পোস্ট সফলভাবে আপলোড হয়েছে!");
-
-        e.target.reset();
-        document.getElementById("preview").innerHTML = "";
-    } else {
-        alert("❌ পোস্ট আপলোডে সমস্যা হয়েছে!");
+    if (!file) {
+      status.innerText = "Please select a video!";
+      return;
     }
 
-    btnText.classList.remove("d-none");
-    loading.classList.add("d-none");
-};
+    status.innerText = "Uploading...";
+
+    const storageRef = ref(storage, "videos/" + Date.now() + "_" + file.name);
+    await uploadBytes(storageRef, file);
+
+    const url = await getDownloadURL(storageRef);
+
+    await addDoc(collection(db, "videos"), { videoUrl: url });
+
+    status.innerText = "Upload Successful!";
+  }
 </script>
 
 </body>
