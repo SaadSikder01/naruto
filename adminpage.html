@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Admin Upload</title>
+    <title>Admin Upload with Progress</title>
 </head>
 <body>
 
@@ -11,40 +11,45 @@
 <input type="file" id="video">
 <button onclick="upload()">Upload</button>
 
-<p id="msg"></p>
+<p id="msg">Progress: 0%</p>
 
 <script>
-async function upload() {
+function upload() {
     const file = document.getElementById("video").files[0];
     if (!file) return alert("Please select a video first!");
 
-    document.getElementById("msg").innerText = "Uploading... Please wait";
-
     const reader = new FileReader();
-    reader.onload = async () => {
+    reader.onload = () => {
         const base64 = reader.result.split(",")[1];
 
-        let res = await fetch(
-            "https://script.google.com/macros/s/AKfycbwO-cef9rbYGsyFW0HyN98senKLi-_bKK8qCpG1-R4zuZwcZDvr5Dbenh3SHTykjWo6/exec",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": file.type,
-                    "X-File-Name": file.name
-                },
-                body: base64
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "https://script.google.com/macros/s/AKfycbwO-cef9rbYGsyFW0HyN98senKLi-_bKK8qCpG1-R4zuZwcZDvr5Dbenh3SHTykjWo6/exec", true);
+        xhr.setRequestHeader("Content-Type", file.type);
+        xhr.setRequestHeader("X-File-Name", file.name);
+
+        // Progress Event
+        xhr.upload.addEventListener("progress", (e) => {
+            if (e.lengthComputable) {
+                const percent = Math.round((e.loaded / e.total) * 100);
+                document.getElementById("msg").innerText = `Progress: ${percent}%`;
             }
-        );
+        });
 
-        let url = await res.text();
+        xhr.onload = () => {
+            if (xhr.status === 200) {
+                const url = xhr.responseText;
+                if (url.startsWith("ERROR")) {
+                    document.getElementById("msg").innerText = "Upload failed: " + url;
+                } else {
+                    localStorage.setItem("latestVideo", url);
+                    document.getElementById("msg").innerText = "Upload Complete! 100%";
+                }
+            } else {
+                document.getElementById("msg").innerText = "Upload failed. Status: " + xhr.status;
+            }
+        };
 
-        if (url.startsWith("ERROR")) {
-            document.getElementById("msg").innerText = "Upload failed: " + url;
-        } else {
-            localStorage.setItem("latestVideo", url);
-            document.getElementById("msg").innerHTML =
-                "Upload Complete!<br>Video Link Saved.";
-        }
+        xhr.send(base64);
     };
 
     reader.readAsDataURL(file);
