@@ -1,114 +1,59 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>নতুন পোস্ট</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body { background: #000; color: #fff; }
-    </style>
+  <title>Upload Video</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    input, button { margin: 10px 0; }
+    #status { margin-top: 15px; }
+  </style>
 </head>
-
 <body>
-<div class="container py-5">
-    <h1 class="text-center mb-4 display-4 text-warning">নতুন পোস্ট করো</h1>
 
-    <div class="card bg-dark mx-auto" style="max-width:600px">
-        <div class="card-body">
+<h2>Upload Video</h2>
 
-            <form id="uploadForm">
-                <div class="mb-3">
-                    <label class="form-label">ছবি বা ভিডিও নির্বাচন করো</label>
-                    <input type="file" id="file" class="form-control" accept="image/*,video/*" required>
-                </div>
+<input type="file" id="videoInput" accept="video/*">
+<br>
+<button onclick="uploadVideo()">Upload</button>
 
-                <div class="mb-3">
-                    <label class="form-label">ক্যাপশন (ঐচ্ছিক)</label>
-                    <textarea id="caption" class="form-control bg-secondary text-white" rows="3"
-                        placeholder="কিছু লিখো..."></textarea>
-                </div>
-
-                <button type="submit" class="btn btn-warning btn-lg w-100">
-                    <span id="btnText">পোস্ট করো</span>
-                    <span id="loading" class="spinner-border spinner-border-sm d-none"></span>
-                </button>
-            </form>
-
-            <div id="preview" class="mt-4 text-center"></div>
-        </div>
-    </div>
-
-    <div class="text-center mt-4">
-        <a href="moreep.html" class="btn btn-danger btn-lg">পোস্টগুলো দেখো</a>
-    </div>
-</div>
-
+<p id="status"></p>
 
 <script>
-// ========= YOUR API KEY HERE =========
-const API_KEY = "bc6fa6c71edf94577f6ef7832f901e96";
-// =====================================
+async function uploadVideo() {
+    const file = document.getElementById("videoInput").files[0];
+    if (!file) return alert("Please select a video!");
 
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "naruto");  // << আপনার Unsigned Preset
 
-// Preview Before Upload
-document.getElementById('file').onchange = e => {
-    const f = e.target.files[0];
-    if (f) {
-        const u = URL.createObjectURL(f);
-        document.getElementById('preview').innerHTML =
-            f.type.startsWith('video')
-                ? `<video src="${u}" controls class="img-fluid rounded"></video>`
-                : `<img src="${u}" class="img-fluid rounded">`;
+    document.getElementById("status").innerText = "Uploading...";
+
+    try {
+        const response = await fetch(
+            "https://api.cloudinary.com/v1_1/dplj1p2gh/video/upload",  // << আপনার Cloud Name
+            {
+                method: "POST",
+                body: formData
+            }
+        );
+
+        const data = await response.json();
+
+        if (data.secure_url) {
+            document.getElementById("status").innerHTML =
+                `Upload complete!<br>
+                 <a href="moreep.html?video=${encodeURIComponent(data.secure_url)}" target="_blank">
+                 Click here to view your video
+                 </a>`;
+        } else {
+            document.getElementById("status").innerText = "Upload failed!";
+        }
+    } catch (err) {
+        console.error(err);
+        document.getElementById("status").innerText = "An error occurred during upload.";
     }
-};
-
-
-// Upload Function
-document.getElementById('uploadForm').onsubmit = async e => {
-    e.preventDefault();
-
-    const file = document.getElementById('file').files[0];
-    const caption = document.getElementById('caption').value.trim() || " ";
-    const btnText = document.getElementById('btnText');
-    const loading = document.getElementById('loading');
-
-    btnText.classList.add("d-none");
-    loading.classList.remove("d-none");
-
-    const fd = new FormData();
-    fd.append("image", file);
-
-    const res = await fetch(`https://api.imgbb.com/1/upload?key=${API_KEY}`, {
-        method: "POST",
-        body: fd
-    });
-
-    const json = await res.json();
-
-    if (json.success) {
-        const post = {
-            url: json.data.url,
-            caption: caption,
-            time: new Date().toLocaleString('bn-BD'),
-            type: file.type.startsWith("video") ? "video" : "image"
-        };
-
-        let posts = JSON.parse(localStorage.getItem("realPosts") || "[]");
-        posts.unshift(post);
-        localStorage.setItem("realPosts", JSON.stringify(posts));
-
-        alert("✔ পোস্ট হয়ে গেছে!");
-
-        e.target.reset();
-        document.getElementById('preview').innerHTML = "";
-    } else {
-        alert("❌ আপলোড হয়নি! API Key সঠিক কিনা চেক করো।");
-    }
-
-    btnText.classList.remove("d-none");
-    loading.classList.add("d-none");
-};
+}
 </script>
 
 </body>
