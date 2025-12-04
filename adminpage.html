@@ -1,66 +1,65 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Upload Video to Supabase</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/supabase.min.js"></script>
+  <title>Big Video Upload (Resumable)</title>
+  <script src="https://releases.transloadit.com/uppy/v3.23.0/uppy.min.js"></script>
+  <link rel="stylesheet" href="https://releases.transloadit.com/uppy/v3.23.0/uppy.min.css">
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    input, button { margin: 10px 0; }
-    #status { margin-top: 15px; }
+    body { font-family: Arial; padding: 30px; }
+    #status { margin-top: 20px; font-weight: bold; }
   </style>
 </head>
 <body>
+  <h2>আপলোড করুন বড় ভিডিও (১জিবি পর্যন্ত সহজে)</h2>
+  <div id="drag-drop-area"></div>
+  <div id="status"></div>
 
-<h2>Upload Video</h2>
+  <script type="module">
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+    
+    const supabase = createClient(
+      "https://uvaoedltxxsobydgrfjv.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV2YW9lZGx0eHhzb2J5ZGdyZmp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NTM0NDUsImV4cCI6MjA4MDQyOTQ0NX0.RzV1tXTrbWMt6kegtbPtxeQjlL5Gp1v_VzmZ8K5kv0s"
+    );
 
-<input type="file" id="videoInput" accept="video/*"><br>
-<button onclick="uploadVideo()">Upload</button>
+    const uppy = new Uppy.Uppy({
+      autoProceed: false,
+      restrictions: {
+        maxFileSize: 2_000_000_000, // 2 GB
+        allowedFileTypes: ['video/*']
+      }
+    })
+    .use(Uppy.Dashboard, { inline: true, target: '#drag-drop-area' })
+    .use(Uppy.Tus, {
+      endpoint: 'https://uvaoedltxxsobydgrfjv.supabase.co/storage/v1/upload/resumable',
+      headers: {
+        authorization: `Bearer ${supabase.auth.session()?.access_token || supabase.auth.getSession().data.session?.access_token || 'anonymous'}`,
+        apikey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV2YW9lZGx0eHhzb2J5ZGdyZmp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NTM0NDUsImV4cCI6MjA4MDQyOTQ0NX0.RzV1tXTrbWMt6kegtbPtxeQjlL5Gp1v_VzmZ8K5kv0s"
+      },
+      chunkSize: 6 * 1024 * 1024, // 6MB chunks (Supabase requirement)
+    });
 
-<p id="status"></p>
+    uppy.on('upload-success', (file, response) => {
+      const bucket = 'videos';
+      const filePath = `${Date.now()}_${file.name}`;
 
-<script>
-// Supabase configuration (public anon key)
-const SUPABASE_URL = "https://uvaoedltxxsobydgrfjv.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV2YW9lZGx0eHhzb2J5ZGdyZmp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NTM0NDUsImV4cCI6MjA4MDQyOTQ0NX0.RzV1tXTrbWMt6kegtbPtxeQjlL5Gp1v_VzmZ8K5kv0s"; // প্রতিস্থাপন করো
-const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      // Supabase-এর resumable endpoint দিয়ে আপলোড হলে object key আলাদা ভাবে সেট করতে হয়
+      supabase.storage
+        .from(bucket)
+        .move(response.uploadURL.split('/object/')[1].split('/').slice(2).join('/'), filePath)
+        .then(() => {
+          const { data: { publicUrl } } = supabase.storage.from(bucket).getPublicUrl(filePath);
+          localStorage.setItem("videoUrl", publicUrl);
+          document.getElementById("status").innerHTML = `
+            আপলোড সফল! <br>
+            <a href="moreep.html" target="_blank">ভিডিও দেখুন</a>
+          `;
+        });
+    });
 
-async function uploadVideo() {
-    const file = document.getElementById("videoInput").files[0];
-    if (!file) return alert("Please select a video!");
-
-    const fileName = `${Date.now()}_${file.name}`;
-
-    document.getElementById("status").innerText = "Uploading...";
-
-    const { data, error } = await supabase.storage
-        .from("videos")   // public bucket name
-        .upload(fileName, file, { cacheControl: '3600', upsert: false });
-
-    if (error) {
-        console.error(error);
-        document.getElementById("status").innerText = "Upload failed!";
-        return;
-    }
-
-    // Public URL generate
-    const { publicUrl, error: urlError } = supabase.storage
-        .from("videos")
-        .getPublicUrl(fileName);
-
-    if (urlError) {
-        console.error(urlError);
-        document.getElementById("status").innerText = "Could not get public URL!";
-        return;
-    }
-
-    // Save URL to localStorage
-    localStorage.setItem("videoUrl", publicUrl);
-
-    document.getElementById("status").innerHTML =
-        `Upload complete!<br>
-        <a href="moreep.html" target="_blank">Click here to watch your video</a>`;
-}
-</script>
-
+    uppy.on('upload-error', (file, error) => {
+      document.getElementById("status").innerText = "আপলোড ফেল! " + error;
+    });
+  </script>
 </body>
 </html>
