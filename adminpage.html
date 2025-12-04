@@ -1,88 +1,58 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ভিডিও আপলোড করুন (২ জিবি পর্যন্ত)</title>
-
-  <!-- Uppy CSS -->
-  <link href="https://releases.transloadit.com/uppy/v3.23.0/uppy.min.css" rel="stylesheet"/>
-
+  <meta charset="UTF-8">
+  <title>ভিডিও আপলোড</title>
+  <link href="https://releases.transloadit.com/uppy/v3.23.0/uppy.min.css" rel="stylesheet">
   <style>
-    body {
-      font-family: 'Kalpurush', Arial, sans-serif;
-      background: #f0f2f5;
-      padding: 20px;
-      margin: 0;
-    }
-    h1 { color: #1a73e8; text-align: center; }
-    .container {
-      max-width: 800px;
-      margin: 20px auto;
-      background: white;
-      padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    }
-    #status {
-      margin-top: 20px;
-      padding: 15px;
-      background: #e8f4fd;
-      border-radius: 8px;
-      text-align: center;
-      font-weight: bold;
-      font-size: 18px;
-    }
-    .success { background: #d4edda; color: #155724; }
+    body { font-family: sans-serif; background: #f0f2f5; padding: 20px; text-align: center; }
+    .card { max-width: 600px; margin: 40px auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+    #status { margin-top: 20px; padding: 15px; background: #e3f2fd; border-radius: 8px; font-weight: bold; }
   </style>
 </head>
 <body>
-
-<div class="container">
+<div class="card">
   <h1>ভিডিও আপলোড করুন</h1>
-  <p style="text-align:center;color:#555;">২ জিবি পর্যন্ত ভিডিও সহজেই আপলোড করুন। নেট কাটলেও আবার শুরু হবে।</p>
-
-  <div id="drag-drop-area"></div>
-
-  <div id="status">এখানে ফাইল ড্র্যাগ করুন অথবা ক্লিক করে বাছাই করুন</div>
+  <p>যেকোনো সাইজ (২ জিবি পর্যন্ত) – Free Plan-এও ১০০% চলে</p>
+  <div id="uppy"></div>
+  <div id="status">ফাইল বেছে নিন বা ড্র্যাগ করুন</div>
 </div>
 
-<!-- Uppy JS -->
 <script src="https://releases.transloadit.com/uppy/v3.23.0/uppy.min.js"></script>
 <script type="module">
   import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-
-  const SUPABASE_URL = "https://uvaoedltxxsobydgrfjv.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV2YW9lZGx0eHhzb2J5ZGdyZmp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NTM0NDUsImV4cCI6MjA4MDQyOTQ0NX0.RzV1tXTrbWMt6kegtbPtxeQjlL5Gp1v_VzmZ8K5kv0s";
-
-  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const supabase = createClient(
+    "https://uvaoedltxxsobydgrfjv.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV2YW9lZGx0eHhzb2J5ZGdyZmp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NTM0NDUsImV4cCI6MjA4MDQyOTQ0NX0.RzV1tXTrbWMt6kegtbPtxeQjlL5Gp1v_VzmZ8K5kv0s"
+  );
 
   const uppy = new Uppy.Uppy({
-    autoProceed: false,
-    allowMultipleUploadBatches: false,
-    restrictions: {
-      maxFileSize: 2_000_000_000,        // ২ জিবি
-      minFileSize: null,
-      maxTotalFileSize: null,
-      allowedFileTypes: ['video/*']
-    },
-    locale: {
-      strings: {
-        dropHereOr: "এখানে ড্রপ করুন বা %{browse} করুন",
-        browse: "বাছাই করুন"
-      }
-    }
+    restrictions: { maxFileSize: 2_000_000_000, allowedFileTypes: ['video/*'] },
+    autoProceed: false
   })
-  .use(Uppy.Dashboard, {
-    inline: true,
-    target: '#drag-drop-area',
-    height: 400,
-    showProgressDetails: true,
-    proudlyDisplayPoweredByUppy: false,
-    note: 'শুধুমাত্র ভিডিও ফাইল (২ জিবি পর্যন্ত)'
-  })
+  .use(Uppy.Dashboard, { inline: true, target: '#uppy', height: 350 })
   .use(Uppy.Tus, {
     endpoint: 'https://uvaoedltxxsobydgrfjv.supabase.co/storage/v1/upload/resumable',
-    headers: {
-      apikey: SUPABASE_ANON_KEY,
-      // anon
+    headers: { apikey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV2YW9lZGx0eHhzb2J5ZGdyZmp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NTM0NDUsImV4cCI6MjA4MDQyOTQ0NX0.RzV1tXTrbWMt6kegtbPtxeQjlL5Gp1v_VzmZ8K5kv0s' },
+    chunkSize: 6 * 1024 * 1024
+  });
+
+  uppy.on('upload-success', async (file) => {
+    await supabase.storage.from('naruto').upload('latest_video.mp4', file.data, {
+      upsert: true,
+      contentType: file.type
+    });
+    const url = supabase.storage.from('naruto').getPublicUrl('latest_video.mp4').data.publicUrl;
+    localStorage.setItem('latestVideoUrl', url + "?t=" + Date.now());
+
+    document.getElementById('status').innerHTML = `
+      <b style="color:green;">সফলভাবে আপলোড হয়েছে!</b><br><br>
+      <a href="moreep.html" target="_blank" style="font-size:22px; color:#1a73e8; text-decoration:none;">
+      এখনই ভিডিও দেখুন ➤
+      </a>`;
+  });
+
+  uppy.on('progress', p => document.getElementById('status').textContent = `আপলোড হচ্ছে… ${p.toFixed(1)}%`);
+</script>
+</body>
+</html>
