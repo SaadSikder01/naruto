@@ -1,176 +1,23 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>ভিডিও দেখুন - Video Collection</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; }
-        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px 20px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        .header h1 { font-size: 2.8em; margin-bottom: 10px; }
-        .header p { font-size: 1.2em; opacity: 0.9; }
-        .container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
-        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 30px; margin-top: 30px; }
-        .video-card { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 8px 25px rgba(0,0,0,0.08); transition: transform 0.3s, box-shadow 0.3s; }
-        .video-card:hover { transform: translateY(-5px); box-shadow: 0 15px 35px rgba(0,0,0,0.15); }
-        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; background: #000; }
-        .video-wrapper video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
-        .video-info { padding: 25px; }
-        .video-info h3 { font-size: 1.4em; margin-bottom: 10px; color: #333; line-height: 1.4; }
-        .video-info p { color: #666; line-height: 1.6; margin-bottom: 15px; }
-        .meta-info { display: flex; justify-content: space-between; color: #888; font-size: 14px; border-top: 1px solid #eee; padding-top: 15px; }
-        .views { display: flex; align-items: center; gap: 5px; }
-        .loading { text-align: center; padding: 50px; font-size: 1.2em; color: #666; }
-        .empty-state { text-align: center; padding: 60px 20px; color: #666; }
-        .empty-state h2 { font-size: 2em; margin-bottom: 20px; color: #333; }
-        .empty-state p { font-size: 1.1em; max-width: 600px; margin: 0 auto 30px; }
-        .empty-state a { display: inline-block; background: #667eea; color: white; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: bold; margin-top: 20px; }
-        .admin-link { position: absolute; top: 20px; right: 20px; background: white; color: #667eea; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        @media (max-width: 768px) { .video-grid { grid-template-columns: 1fr; } .header h1 { font-size: 2em; } }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    </style>
+    <meta charset="UTF-8">
+    <title>Watch Video</title>
 </head>
 <body>
-    <a href="adminpage.html" class="admin-link">⚡ Admin পেজ</a>
-    
-    <div class="header">
-        <h1>🎬 আমাদের ভিডিও কালেকশন</h1>
-        <p>সর্বশেষ আপলোডকৃত ভিডিওগুলো দেখুন</p>
-    </div>
-    
-    <div class="container">
-        <div id="loading" class="loading">
-            <div style="display: inline-block; width: 50px; height: 50px; border: 3px solid #f3f3f3; border-top: 3px solid #667eea; border-radius: 50%; animation: spin 1s linear infinite;"></div>
-            <p>ভিডিও লোড হচ্ছে...</p>
-        </div>
-        
-        <div id="empty-state" class="empty-state" style="display: none;">
-            <h2>📹 কোনো ভিডিও নেই</h2>
-            <p>প্রথম ভিডিও আপলোড করতে admin পেজে যান</p>
-            <a href="adminpage.html">ভিডিও আপলোড করুন</a>
-        </div>
-        
-        <div id="video-grid" class="video-grid" style="display: none;"></div>
-    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
-        // আপনার Supabase প্রজেক্ট ডিটেইলস
-        const SUPABASE_URL = 'https://uvaoedltxxsobydgrfjv.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV2YW9lZGx0eHhzb2J5ZGdyZmp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NTM0NDUsImV4cCI6MjA4MDQyOTQ0NX0.RzV1tXTrbWMt6kegtbPtxeQjlL5Gp1v_VzmZ8K5kv0s';
-        
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        
-        // DOM elements
-        const loadingEl = document.getElementById('loading');
-        const emptyStateEl = document.getElementById('empty-state');
-        const videoGridEl = document.getElementById('video-grid');
-        
-        // ভিডিও লোড ফাংশন
-        async function loadVideos() {
-            try {
-                // ডাটাবেস থেকে ভিডিও লোড
-                const { data: videos, error } = await supabase
-                    .from('videos')
-                    .select('*')
-                    .order('created_at', { ascending: false });
-                
-                if (error) throw error;
-                
-                // লোডিং হাইড করুন
-                loadingEl.style.display = 'none';
-                
-                // ভিডিও না থাকলে
-                if (!videos || videos.length === 0) {
-                    emptyStateEl.style.display = 'block';
-                    return;
-                }
-                
-                // ভিডিও গ্রিড শো করুন
-                videoGridEl.style.display = 'grid';
-                
-                // ভিডিও কার্ড তৈরি
-                videos.forEach(video => {
-                    const videoCard = document.createElement('div');
-                    videoCard.className = 'video-card';
-                    
-                    // ফাইল সাইজ ফরম্যাট
-                    const fileSizeMB = video.file_size ? (video.file_size / (1024*1024)).toFixed(2) : '0';
-                    
-                    // তারিখ ফরম্যাট
-                    const date = new Date(video.created_at);
-                    const formattedDate = date.toLocaleDateString('bn-BD', {
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric'
-                    });
-                    
-                    videoCard.innerHTML = `
-                        <div class="video-wrapper">
-                            <video controls preload="metadata" 
-                                   poster="https://via.placeholder.com/350x200/667eea/ffffff?text=${encodeURIComponent(video.title)}">
-                                <source src="${video.video_url}" type="video/mp4">
-                                আপনার ব্রাউজার ভিডিও সাপোর্ট করে না।
-                            </video>
-                        </div>
-                        <div class="video-info">
-                            <h3>${video.title}</h3>
-                            ${video.description ? `<p>${video.description}</p>` : ''}
-                            
-                            <div class="meta-info">
-                                <div class="views">
-                                    <span>👁️ ${video.views || 0} ভিউ</span>
-                                </div>
-                                <div>
-                                    <span>📅 ${formattedDate}</span>
-                                </div>
-                            </div>
-                            ${video.file_size ? `<div style="font-size: 12px; color: #999; margin-top: 10px;">📏 ${fileSizeMB} MB</div>` : ''}
-                        </div>
-                    `;
-                    
-                    videoGridEl.appendChild(videoCard);
-                    
-                    // ভিউস কাউন্ট আপডেট
-                    updateViewCount(video.id);
-                });
-                
-            } catch (error) {
-                console.error('Error loading videos:', error);
-                loadingEl.innerHTML = `
-                    <div style="color: #e74c3c;">
-                        <h3>ত্রুটি!</h3>
-                        <p>ভিডিও লোড করতে সমস্যা হচ্ছে। পেজ রিলোড করুন।</p>
-                        <button onclick="location.reload()" style="background: #e74c3c; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 10px;">
-                            রিলোড করুন
-                        </button>
-                    </div>
-                `;
-            }
-        }
-        
-        // ভিউস কাউন্ট আপডেট ফাংশন
-        async function updateViewCount(videoId) {
-            try {
-                // ভিউস +1 করো
-                const { data: currentVideo } = await supabase
-                    .from('videos')
-                    .select('views')
-                    .eq('id', videoId)
-                    .single();
-                
-                if (currentVideo) {
-                    await supabase
-                        .from('videos')
-                        .update({ views: (currentVideo.views || 0) + 1 })
-                        .eq('id', videoId);
-                }
-            } catch (error) {
-                console.error('Error updating view count:', error);
-            }
-        }
-        
-        // পেজ লোড হলে ভিডিও লোড
-        document.addEventListener('DOMContentLoaded', loadVideos);
-    </script>
+<h2>Latest Uploaded Video</h2>
+
+<video id="vid" width="100%" controls></video>
+
+<script>
+const url = localStorage.getItem("latestVideo");
+if (url) {
+    document.getElementById("vid").src = url;
+} else {
+    document.body.innerHTML += "<p>No video found!</p>";
+}
+</script>
+
 </body>
 </html>
