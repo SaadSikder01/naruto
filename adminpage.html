@@ -38,11 +38,11 @@
   });
 
   uppy.on('upload-success', async (file) => {
-    await supabase.storage.from('naruto').upload('latest_video.mp4', file.data, {
+    await supabase.storage.from('videos').upload('latest_video.mp4', file.data, {
       upsert: true,
       contentType: file.type
     });
-    const url = supabase.storage.from('naruto').getPublicUrl('latest_video.mp4').data.publicUrl;
+    const url = supabase.storage.from('videos').getPublicUrl('latest_video.mp4').data.publicUrl;
     localStorage.setItem('latestVideoUrl', url + "?t=" + Date.now());
 
     document.getElementById('status').innerHTML = `
