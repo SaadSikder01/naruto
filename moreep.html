@@ -1,27 +1,24 @@
 <!DOCTYPE html>
-<html>
+<html lang="bn">
 <head>
-  <title>Watch Video</title>
+  <meta charset="UTF-8">
+  <title>ভিডিও দেখুন</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    video { margin-top: 20px; border: 1px solid #ccc; max-width: 100%; }
+    body { margin:0; background:#000; display:flex; justify-content:center; align-items:center; height:100vh; }
+    video { max-width:98vw; max-height:98vh; border-radius:12px; }
+    .btn { position:fixed; top:15px; left:15px; background:rgba(255,255,255,0.2); color:white; padding:10px 18px; border-radius:30px; text-decoration:none; font-size:14px; backdrop-filter:blur(10px); }
   </style>
 </head>
 <body>
+  <a href="index.html" class="btn">নতুন ভিডিও আপলোড</a>
+  <video id="vid" controls autoplay></video>
 
-<h2>Your Uploaded Video</h2>
-
-<video id="videoPlayer" width="600" controls></video>
-
-<script>
-const videoUrl = localStorage.getItem("videoUrl");
-
-if (videoUrl) {
-    document.getElementById("videoPlayer").src = videoUrl;
-} else {
-    document.body.innerHTML += "<p>No video found! Please upload first from index.html.</p>";
-}
-</script>
-
+  <script>
+    const video = document.getElementById('vid');
+    const saved = localStorage.getItem('latestVideoUrl');
+    const fallback = "https://uvaoedltxxsobydgrfjv.supabase.co/storage/v1/object/public/videos/latest_video.mp4?t=" + Date.now();
+    video.src = saved || fallback;
+    video.load();
+  </script>
 </body>
 </html>
