@@ -25,27 +25,25 @@ async function uploadVideo() {
 
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("upload_preset", "naruto");  // << আপনার Unsigned Preset
+    formData.append("upload_preset", "naruto");  // আপনার Unsigned Preset
 
     document.getElementById("status").innerText = "Uploading...";
 
     try {
         const response = await fetch(
-            "https://api.cloudinary.com/v1_1/dplj1p2gh/video/upload",  // << আপনার Cloud Name
-            {
-                method: "POST",
-                body: formData
-            }
+            "https://api.cloudinary.com/v1_1/dplj1p2gh/video/upload",
+            { method: "POST", body: formData }
         );
 
         const data = await response.json();
 
         if (data.secure_url) {
+            // localStorage-এ URL সংরক্ষণ
+            localStorage.setItem('videoUrl', data.secure_url);
+
             document.getElementById("status").innerHTML =
                 `Upload complete!<br>
-                 <a href="moreep.html?video=${encodeURIComponent(data.secure_url)}" target="_blank">
-                 Click here to view your video
-                 </a>`;
+                 <a href="moreep.html" target="_blank">Click here to watch your video</a>`;
         } else {
             document.getElementById("status").innerText = "Upload failed!";
         }
