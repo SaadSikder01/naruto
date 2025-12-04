@@ -1,280 +1,55 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Admin - ভিডিও আপলোড</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
-        .container { max-width: 800px; margin: 0 auto; background: white; border-radius: 20px; padding: 40px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
-        h1 { color: #333; margin-bottom: 30px; text-align: center; font-size: 2.5em; }
-        .form-group { margin-bottom: 25px; }
-        label { display: block; margin-bottom: 8px; color: #555; font-weight: 600; }
-        input, textarea { width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 16px; transition: border 0.3s; }
-        input:focus, textarea:focus { outline: none; border-color: #667eea; }
-        textarea { min-height: 120px; resize: vertical; }
-        .file-input { padding: 20px; border: 2px dashed #667eea; background: #f8f9ff; text-align: center; cursor: pointer; border-radius: 10px; }
-        .file-input:hover { background: #f0f3ff; }
-        #file-name { margin-top: 10px; color: #666; font-size: 14px; }
-        button { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 18px 40px; font-size: 18px; border-radius: 10px; cursor: pointer; width: 100%; font-weight: 600; transition: transform 0.3s; }
-        button:hover { transform: translateY(-2px); }
-        button:disabled { opacity: 0.6; cursor: not-allowed; }
-        .progress-container { margin-top: 20px; display: none; }
-        .progress-bar { width: 100%; height: 10px; background: #e0e0e0; border-radius: 5px; overflow: hidden; }
-        .progress-fill { height: 100%; background: #4CAF50; width: 0%; transition: width 0.3s; }
-        #status { margin-top: 20px; padding: 15px; border-radius: 10px; display: none; }
-        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-        .video-preview { margin-top: 20px; display: none; }
-        .video-preview video { width: 100%; border-radius: 10px; max-height: 300px; }
-        .back-link { display: inline-block; margin-top: 20px; color: #667eea; text-decoration: none; }
-    </style>
+    <meta charset="UTF-8">
+    <title>Admin Upload</title>
 </head>
 <body>
-    <div class="container">
-        <h1>🎥 ভিডিও আপলোড করুন</h1>
-        <a href="moreep.html" class="back-link">← ভিডিও দেখতে যান</a>
-        
-        <form id="uploadForm">
-            <div class="form-group">
-                <label for="title">ভিডিও টাইটেল *</label>
-                <input type="text" id="title" placeholder="ভিডিওর টাইটেল লিখুন" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="description">বর্ণনা (ঐচ্ছিক)</label>
-                <textarea id="description" placeholder="ভিডিওর বর্ণনা লিখুন"></textarea>
-            </div>
-            
-            <div class="form-group">
-                <label for="videoFile">ভিডিও ফাইল *</label>
-                <div class="file-input" onclick="document.getElementById('videoFile').click()">
-                    <span style="font-size: 50px;">📁</span>
-                    <p>ভিডিও ফাইল সিলেক্ট করুন (Max 500MB)</p>
-                    <p style="font-size: 14px; color: #666;">MP4, WebM, MOV ফরম্যাট সাপোর্টেড</p>
-                </div>
-                <input type="file" id="videoFile" accept="video/*" hidden required>
-                <div id="file-name"></div>
-            </div>
-            
-            <div class="video-preview" id="videoPreview">
-                <label>প্রিভিউ:</label>
-                <video id="previewPlayer" controls></video>
-            </div>
-            
-            <div class="progress-container" id="progressContainer">
-                <label>আপলোড প্রোগ্রেস:</label>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progressFill"></div>
-                </div>
-                <div id="progressText" style="text-align: center; margin-top: 5px;">0%</div>
-            </div>
-            
-            <div id="status"></div>
-            
-            <button type="submit" id="submitBtn">📤 ভিডিও আপলোড করুন</button>
-        </form>
-    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
-        // ====== ১০০% কাজ করবে এই কোড ======
-async function fixAllProblems() {
-    console.log("Fixing Supabase setup...");
-    
-    try {
-        // 1. টেবিল তৈরি (যদি না থাকে)
-        await fetch('https://uvaoedltxxsobydgrfjv.supabase.co/rest/v1/videos', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV2YW9lZGx0eHhzb2J5ZGdyZmp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NTM0NDUsImV4cCI6MjA4MDQyOTQ0NX0.RzV1tXTrbWMt6kegtbPtxeQjlL5Gp1v_VzmZ8K5kv0s',
-                'Prefer': 'return=minimal'
-            },
-            body: JSON.stringify({
-                title: 'setup_test',
-                video_url: 'test',
-                created_at: new Date().toISOString()
-            })
-        });
-        
-        // 2. RLS Disable via SQL
-        await fetch('https://uvaoedltxxsobydgrfjv.supabase.co/rest/v1/rpc', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV2YW9lZGx0eHhzb2J5ZGdyZmp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NTM0NDUsImV4cCI6MjA4MDQyOTQ0NX0.RzV1tXTrbWMt6kegtbPtxeQjlL5Gp1v_VzmZ8K5kv0s',
-                'Prefer': 'return=minimal'
-            },
-            body: JSON.stringify({
-                query: 'ALTER TABLE videos DISABLE ROW LEVEL SECURITY;'
-            })
-        });
-        
-        console.log("✅ All fixes applied successfully!");
-        alert("✅ System is ready! Now upload your video.");
-        
-    } catch (error) {
-        console.log("System already fixed or minor error:", error);
-    }
-}
+<h2>Upload Video to Google Drive</h2>
 
-// পেজ লোড হওয়ার সাথে সাথে ফিক্স করুন
-document.addEventListener('DOMContentLoaded', fixAllProblems);
-// ====== কোড শেষ ======
-        // আপনার Supabase প্রজেক্ট ডিটেইলস
-        const SUPABASE_URL = 'https://uvaoedltxxsobydgrfjv.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV2YW9lZGx0eHhzb2J5ZGdyZmp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NTM0NDUsImV4cCI6MjA4MDQyOTQ0NX0.RzV1tXTrbWMt6kegtbPtxeQjlL5Gp1v_VzmZ8K5kv0s';
-        
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        
-        // DOM elements
-        const videoFile = document.getElementById('videoFile');
-        const fileName = document.getElementById('file-name');
-        const previewPlayer = document.getElementById('previewPlayer');
-        const videoPreview = document.getElementById('videoPreview');
-        const progressContainer = document.getElementById('progressContainer');
-        const progressFill = document.getElementById('progressFill');
-        const progressText = document.getElementById('progressText');
-        const statusDiv = document.getElementById('status');
-        const submitBtn = document.getElementById('submitBtn');
-        
-        // ফাইল সিলেক্ট হলে
-        videoFile.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            
-            // ফাইল সাইজ চেক (500MB)
-            const maxSize = 500 * 1024 * 1024;
-            if (file.size > maxSize) {
-                showStatus('ভিডিও ফাইল 500MB এর ছোট হতে হবে!', 'error');
-                videoFile.value = '';
-                return;
+<input type="file" id="video">
+<button onclick="upload()">Upload</button>
+
+<p id="msg"></p>
+
+<script>
+async function upload() {
+    const file = document.getElementById("video").files[0];
+    if (!file) return alert("Please select a video first!");
+
+    document.getElementById("msg").innerText = "Uploading... Please wait";
+
+    const reader = new FileReader();
+    reader.onload = async () => {
+        const base64 = reader.result.split(",")[1];
+
+        let res = await fetch(
+            "https://script.google.com/macros/s/AKfycbwO-cef9rbYGsyFW0HyN98senKLi-_bKK8qCpG1-R4zuZwcZDvr5Dbenh3SHTykjWo6/exec",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": file.type,
+                    "X-File-Name": file.name
+                },
+                body: base64
             }
-            
-            // ফাইল নাম দেখাও
-            fileName.innerHTML = `
-                <strong>সিলেক্টেড ফাইল:</strong> ${file.name}<br>
-                <strong>সাইজ:</strong> ${(file.size / (1024*1024)).toFixed(2)} MB
-            `;
-            
-            // ভিডিও প্রিভিউ
-            if (file.type.startsWith('video/')) {
-                const url = URL.createObjectURL(file);
-                previewPlayer.src = url;
-                videoPreview.style.display = 'block';
-            }
-        });
-        
-        // ফর্ম সাবমিট
-        document.getElementById('uploadForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const title = document.getElementById('title').value.trim();
-            const description = document.getElementById('description').value.trim();
-            const file = videoFile.files[0];
-            
-            if (!title || !file) {
-                showStatus('টাইটেল এবং ভিডিও ফাইল দিতে হবে!', 'error');
-                return;
-            }
-            
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = 'আপলোড হচ্ছে...';
-            progressContainer.style.display = 'block';
-            
-            try {
-                // 1. ফাইল আপলোড
-                const fileExt = file.name.split('.').pop();
-                const fileName = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}.${fileExt}`;
-                const filePath = `public/${fileName}`;
-                
-                // Progress tracking
-                const uploadObserver = {
-                    onUploadProgress: (progressEvent) => {
-                        const percent = Math.round((progressEvent.loaded / progressEvent.total) * 100);
-                        progressFill.style.width = `${percent}%`;
-                        progressText.textContent = `${percent}%`;
-                    }
-                };
-                
-                const { data: uploadData, error: uploadError } = await supabase.storage
-                    .from('videos')
-                    .upload(filePath, file, {
-                        cacheControl: '3600',
-                        upsert: false,
-                        // Custom progress handling
-                    });
-                
-                if (uploadError) throw uploadError;
-                
-                // Manual progress simulation (since supabase-js doesn't support progress in browser)
-                let progress = 0;
-                const progressInterval = setInterval(() => {
-                    progress += 5;
-                    if (progress > 95) clearInterval(progressInterval);
-                    progressFill.style.width = `${progress}%`;
-                    progressText.textContent = `${progress}%`;
-                }, 200);
-                
-                // 2. Public URL জেনারেট
-                const { data: urlData } = supabase.storage
-                    .from('videos')
-                    .getPublicUrl(filePath);
-                
-                // Complete progress
-                clearInterval(progressInterval);
-                progressFill.style.width = '100%';
-                progressText.textContent = '100%';
-                
-                // 3. ডাটাবেসে সেভ
-                const { data: dbData, error: dbError } = await supabase
-                    .from('videos')
-                    .insert([{
-                        title: title,
-                        description: description,
-                        video_url: urlData.publicUrl,
-                        video_path: filePath,
-                        file_name: file.name,
-                        file_size: file.size,
-                        views: 0
-                    }]);
-                
-                if (dbError) throw dbError;
-                
-                // সফল মেসেজ
-                showStatus('✅ ভিডিও সফলভাবে আপলোড হয়েছে!', 'success');
-                
-                // ফর্ম রিসেট
-                setTimeout(() => {
-                    document.getElementById('uploadForm').reset();
-                    fileName.innerHTML = '';
-                    videoPreview.style.display = 'none';
-                    progressContainer.style.display = 'none';
-                    progressFill.style.width = '0%';
-                    progressText.textContent = '0%';
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = '📤 ভিডিও আপলোড করুন';
-                }, 2000);
-                
-            } catch (error) {
-                console.error('Error:', error);
-                showStatus(`❌ ত্রুটি: ${error.message}`, 'error');
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '📤 ভিডিও আপলোড করুন';
-            }
-        });
-        
-        // স্ট্যাটাস মেসেজ ফাংশন
-        function showStatus(message, type) {
-            statusDiv.textContent = message;
-            statusDiv.className = type;
-            statusDiv.style.display = 'block';
-            
-            setTimeout(() => {
-                statusDiv.style.display = 'none';
-            }, 5000);
+        );
+
+        let url = await res.text();
+
+        if (url.startsWith("ERROR")) {
+            document.getElementById("msg").innerText = "Upload failed: " + url;
+        } else {
+            localStorage.setItem("latestVideo", url);
+            document.getElementById("msg").innerHTML =
+                "Upload Complete!<br>Video Link Saved.";
         }
-    </script>
+    };
+
+    reader.readAsDataURL(file);
+}
+</script>
+
 </body>
 </html>
-
