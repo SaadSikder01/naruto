@@ -1,77 +1,27 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>All Videos</title>
-
+  <title>Watch Video</title>
   <style>
-    body {
-      font-family: Arial;
-      background: #f0f0f0;
-    }
-    .box {
-      background: white;
-      padding: 30px;
-      width: 350px;
-      margin: 50px auto;
-      border-radius: 10px;
-      text-align: center;
-      box-shadow: 0 0 10px #ccc;
-    }
-    video {
-      border: 2px solid #444;
-      border-radius: 10px;
-      margin-bottom: 20px;
-    }
-    a {
-      text-decoration: none;
-      color: #4e73df;
-      font-weight: bold;
-    }
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    video { margin-top: 20px; border: 1px solid #ccc; }
   </style>
-
 </head>
 <body>
 
-<div class="box">
-  <h2>All Uploaded Videos</h2>
+<h2>Watch Uploaded Video</h2>
 
-  <div id="videos"></div>
+<video id="videoPlayer" width="600" controls></video>
 
-  <a href="index.html">Upload Another Video</a>
-</div>
+<script>
+const urlParams = new URLSearchParams(window.location.search);
+const videoUrl = urlParams.get("video");
 
-<script type="module">
-  // Firebase Config
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
-  import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyA55ipKtczx5mZaAkFRj9bTZcoW_kA7c98",
-    authDomain: "naruto-76eb1.firebaseapp.com",
-    projectId: "naruto-76eb1",
-    storageBucket: "naruto-76eb1.firebasestorage.app",
-    messagingSenderId: "321658766206",
-    appId: "1:321658766206:web:6e96c2b05d1bfd6792a92f"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
-  async function loadVideos() {
-    const container = document.getElementById("videos");
-    const snapshot = await getDocs(collection(db, "videos"));
-
-    snapshot.forEach(doc => {
-      const url = doc.data().videoUrl;
-      container.innerHTML += `
-        <video width="300" controls>
-          <source src="${url}">
-        </video>
-      `;
-    });
-  }
-
-  loadVideos();
+if (videoUrl) {
+    document.getElementById("videoPlayer").src = videoUrl;
+} else {
+    document.body.innerHTML += "<p>No video selected!</p>";
+}
 </script>
 
 </body>
