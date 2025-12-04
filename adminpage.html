@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Upload Video</title>
+  <title>Upload Video to Supabase</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/supabase.min.js"></script>
   <style>
     body { font-family: Arial, sans-serif; padding: 20px; }
     input, button { margin: 10px 0; }
@@ -12,45 +13,52 @@
 
 <h2>Upload Video</h2>
 
-<input type="file" id="videoInput" accept="video/*">
-<br>
+<input type="file" id="videoInput" accept="video/*"><br>
 <button onclick="uploadVideo()">Upload</button>
 
 <p id="status"></p>
 
 <script>
+// Supabase configuration (public anon key)
+const SUPABASE_URL = "https://uvaoedltxxsobydgrfjv.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV2YW9lZGx0eHhzb2J5ZGdyZmp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NTM0NDUsImV4cCI6MjA4MDQyOTQ0NX0.RzV1tXTrbWMt6kegtbPtxeQjlL5Gp1v_VzmZ8K5kv0s"; // প্রতিস্থাপন করো
+const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 async function uploadVideo() {
     const file = document.getElementById("videoInput").files[0];
     if (!file) return alert("Please select a video!");
 
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", "naruto");  // আপনার Unsigned Preset
+    const fileName = `${Date.now()}_${file.name}`;
 
     document.getElementById("status").innerText = "Uploading...";
 
-    try {
-        const response = await fetch(
-            "https://api.cloudinary.com/v1_1/dplj1p2gh/video/upload",
-            { method: "POST", body: formData }
-        );
+    const { data, error } = await supabase.storage
+        .from("videos")   // public bucket name
+        .upload(fileName, file, { cacheControl: '3600', upsert: false });
 
-        const data = await response.json();
-
-        if (data.secure_url) {
-            // localStorage-এ URL সংরক্ষণ
-            localStorage.setItem('videoUrl', data.secure_url);
-
-            document.getElementById("status").innerHTML =
-                `Upload complete!<br>
-                 <a href="moreep.html" target="_blank">Click here to watch your video</a>`;
-        } else {
-            document.getElementById("status").innerText = "Upload failed!";
-        }
-    } catch (err) {
-        console.error(err);
-        document.getElementById("status").innerText = "An error occurred during upload.";
+    if (error) {
+        console.error(error);
+        document.getElementById("status").innerText = "Upload failed!";
+        return;
     }
+
+    // Public URL generate
+    const { publicUrl, error: urlError } = supabase.storage
+        .from("videos")
+        .getPublicUrl(fileName);
+
+    if (urlError) {
+        console.error(urlError);
+        document.getElementById("status").innerText = "Could not get public URL!";
+        return;
+    }
+
+    // Save URL to localStorage
+    localStorage.setItem("videoUrl", publicUrl);
+
+    document.getElementById("status").innerHTML =
+        `Upload complete!<br>
+        <a href="moreep.html" target="_blank">Click here to watch your video</a>`;
 }
 </script>
 
