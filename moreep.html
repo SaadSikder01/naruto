@@ -1,30 +1,57 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <title>Latest Video</title>
+  <meta charset="UTF-8">
+  <title>Gallery</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    body{font-family:system-ui,Segoe UI,Arial;margin:20px}
+    .item{margin-bottom:18px}
+    img{max-width:320px;height:auto;display:block}
+    video{max-width:640px;display:block;margin-bottom:6px}
+    .meta{color:#666;font-size:0.9rem}
+  </style>
 </head>
 <body>
-
-<h2>Latest Uploaded Video</h2>
-
-<video id="player" width="100%" controls>
-    <source id="videoSrc" type="video/mp4">
-</video>
-
-<p id="msg"></p>
+  <h2>Uploaded Gallery</h2>
+  <div id="container"></div>
 
 <script>
-const url = localStorage.getItem("latestVideo");
+function driveViewUrl(fileName){
+  // Google Drive public folder download URL
+  return `https://drive.google.com/uc?export=view&id=1QQ7hkSxdkqQDxuGU_IEXzrvfQXKstVWb`; 
+  // এখানে আমরা folder public, তবে individual file ID এড করা যাবে Apps Script দিয়ে
+}
 
-if (!url) {
-    document.getElementById("msg").innerText = "No video uploaded yet!";
+const container = document.getElementById('container');
+const list = JSON.parse(localStorage.getItem('uploadedFiles') || "[]");
+if(list.length === 0){
+  container.innerHTML = "<p>No uploaded files yet.</p>";
 } else {
-    document.getElementById("videoSrc").src = url;
-    document.getElementById("player").load();
-    document.getElementById("msg").innerText = "Video loaded!";
+  list.reverse().forEach(item=>{
+    const ext = (item.name || "").split('.').pop().toLowerCase();
+    const wrapper = document.createElement('div');
+    wrapper.className = 'item';
+
+    if(['mp4','webm','ogg','ogv'].includes(ext)){
+      const v = document.createElement('video');
+      v.controls = true;
+      v.src = driveViewUrl(item.name);
+      wrapper.appendChild(v);
+    } else {
+      const img = document.createElement('img');
+      img.src = driveViewUrl(item.name);
+      wrapper.appendChild(img);
+    }
+
+    const meta = document.createElement('div');
+    meta.className = 'meta';
+    meta.innerText = `${item.name || item.id} — uploaded: ${new Date(item.time).toLocaleString()}`;
+    wrapper.appendChild(meta);
+
+    container.appendChild(wrapper);
+  });
 }
 </script>
-
 </body>
 </html>
