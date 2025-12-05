@@ -1,52 +1,54 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>Gallery</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="utf-8">
+  <title>Gallery — Saad</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body{font-family:system-ui,Segoe UI,Arial;margin:20px}
-    .item{margin-bottom:18px}
-    img{max-width:320px;height:auto;display:block}
-    video{max-width:640px;display:block;margin-bottom:6px}
-    .meta{color:#666;font-size:0.9rem}
+    body { font-family: Arial, sans-serif; margin:20px; }
+    .item { margin-bottom:20px; }
+    img, video { max-width: 640px; display:block; margin-bottom:6px; }
+    .meta { color: #666; font-size:0.9rem; }
   </style>
 </head>
 <body>
-  <h2>Uploaded Gallery</h2>
+  <h2>Uploaded Files Gallery</h2>
   <div id="container"></div>
 
 <script>
-function driveViewUrl(fileName){
-  // Google Drive public folder download URL
-  return `https://drive.google.com/uc?export=view&id=1QQ7hkSxdkqQDxuGU_IEXzrvfQXKstVWb`; 
-  // এখানে আমরা folder public, তবে individual file ID এড করা যাবে Apps Script দিয়ে
-}
-
 const container = document.getElementById('container');
 const list = JSON.parse(localStorage.getItem('uploadedFiles') || "[]");
-if(list.length === 0){
+
+function driveViewUrl(id) {
+  return `https://drive.google.com/uc?export=view&id=${id}`;
+}
+
+function humanTime(ts){
+  return new Date(ts).toLocaleString();
+}
+
+if(list.length===0){
   container.innerHTML = "<p>No uploaded files yet.</p>";
 } else {
   list.reverse().forEach(item=>{
-    const ext = (item.name || "").split('.').pop().toLowerCase();
+    const ext = item.name.split('.').pop().toLowerCase();
     const wrapper = document.createElement('div');
     wrapper.className = 'item';
 
     if(['mp4','webm','ogg','ogv'].includes(ext)){
       const v = document.createElement('video');
       v.controls = true;
-      v.src = driveViewUrl(item.name);
+      v.src = driveViewUrl(item.id);
       wrapper.appendChild(v);
     } else {
       const img = document.createElement('img');
-      img.src = driveViewUrl(item.name);
+      img.src = driveViewUrl(item.id);
       wrapper.appendChild(img);
     }
 
     const meta = document.createElement('div');
     meta.className = 'meta';
-    meta.innerText = `${item.name || item.id} — uploaded: ${new Date(item.time).toLocaleString()}`;
+    meta.innerText = `${item.name} — uploaded: ${humanTime(item.time)}`;
     wrapper.appendChild(meta);
 
     container.appendChild(wrapper);
