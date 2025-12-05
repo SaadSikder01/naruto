@@ -1,75 +1,64 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>Admin Upload</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="utf-8">
+  <title>Admin Upload — Saad</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body{font-family:system-ui,Segoe UI,Arial;margin:20px}
-    input,button{padding:10px 14px;margin:6px 0}
-    #msg{margin-top:12px;font-weight:bold}
+    body { font-family: Arial, sans-serif; margin:20px; }
+    input, button { padding:8px 12px; margin:6px 0; }
+    #msg { margin-top:12px; }
   </style>
 </head>
 <body>
-  <h2>Upload Video / Image</h2>
+  <h2>Upload Video / Image to Google Drive</h2>
   <input type="file" id="fileInput" accept="video/*,image/*"><br>
   <button id="uploadBtn">Upload</button>
   <p id="msg">Progress: 0%</p>
 
 <script>
-const webAppUrl = "https://script.google.com/macros/s/AKfycbxJVX7e46e8XOBQ0_ApPNR7SvC2zoAm9JG7zVi4pfaR8jfYz0U99lrx6ZW7jpTDH5V5rw/exec";
+const uploadBtn = document.getElementById('uploadBtn');
+const fileInput = document.getElementById('fileInput');
+const msg = document.getElementById('msg');
 
-const uploadBtn = document.getElementById("uploadBtn");
-const fileInput = document.getElementById("fileInput");
-const msg = document.getElementById("msg");
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxJVX7e46e8XOBQ0_ApPNR7SvC2zoAm9JG7zVi4pfaR8jfYz0U99lrx6ZW7jpTDH5V5rw/exec";
 
-uploadBtn.onclick = () => {
+uploadBtn.addEventListener('click', () => {
   const file = fileInput.files[0];
-  if(!file) return alert("Select a file first!");
+  if(!file) return alert("Please select a file first!");
 
-  const reader = new FileReader();
-  reader.onload = () => {
-    const base64 = reader.result.split(",")[1];
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", webAppUrl, true);
-    xhr.setRequestHeader("Content-Type", file.type);
-    xhr.setRequestHeader("X-File-Name", file.name);
+  msg.innerText = "Starting upload...";
 
-    xhr.upload.onprogress = (e) => {
-      if(e.lengthComputable){
-        const percent = Math.round((e.loaded / e.total) * 100);
-        msg.innerText = `Progress: ${percent}%`;
-      }
-    };
+  const formData = new FormData();
+  formData.append('file', file);
 
-    xhr.onload = () => {
-      if(xhr.status === 200){
-        const res = xhr.responseText;
-        if(res.startsWith("SUCCESS")){
-          msg.innerText = "Upload Complete! ✅";
+  const xhr = new XMLHttpRequest();
+  xhr.open('POST', WEB_APP_URL, true);
 
-          // Save file info in localStorage for gallery
-          const list = JSON.parse(localStorage.getItem('uploadedFiles') || "[]");
-          list.push({ name:file.name, time:Date.now() });
-          localStorage.setItem('uploadedFiles', JSON.stringify(list));
-
-        } else {
-          msg.innerText = "Upload failed: " + res;
-        }
-      } else {
-        msg.innerText = "Upload failed. Status: " + xhr.status;
-      }
-    };
-
-    xhr.onerror = () => {
-      msg.innerText = "Network error during upload.";
-    };
-
-    xhr.send(base64);
+  xhr.upload.onprogress = (e) => {
+    if(e.lengthComputable){
+      const percent = Math.round((e.loaded / e.total) * 100);
+      msg.innerText = `Progress: ${percent}%`;
+    }
   };
 
-  reader.readAsDataURL(file);
-};
+  xhr.onload = () => {
+    if(xhr.status === 200){
+      msg.innerText = "Upload complete!";
+      // Save file info to localStorage for gallery
+      const list = JSON.parse(localStorage.getItem('uploadedFiles') || "[]");
+      const data = JSON.parse(xhr.responseText);
+      list.push({name: file.name, id: data.id, time: Date.now()});
+      localStorage.setItem('uploadedFiles', JSON.stringify(list));
+    } else {
+      msg.innerText = "Upload failed. Status: " + xhr.status;
+    }
+  };
+
+  xhr.onerror = () => { msg.innerText = "Network error during upload."; }
+
+  xhr.send(formData);
+});
 </script>
 </body>
 </html>
