@@ -2,20 +2,27 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Watch Video</title>
+    <title>Latest Video</title>
 </head>
 <body>
 
 <h2>Latest Uploaded Video</h2>
 
-<video id="vid" width="100%" controls></video>
+<video id="player" width="100%" controls>
+    <source id="videoSrc" type="video/mp4">
+</video>
+
+<p id="msg"></p>
 
 <script>
 const url = localStorage.getItem("latestVideo");
-if (url) {
-    document.getElementById("vid").src = url;
+
+if (!url) {
+    document.getElementById("msg").innerText = "No video uploaded yet!";
 } else {
-    document.body.innerHTML += "<p>No video found!</p>";
+    document.getElementById("videoSrc").src = url;
+    document.getElementById("player").load();
+    document.getElementById("msg").innerText = "Video loaded!";
 }
 </script>
 
