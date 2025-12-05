@@ -1,43 +1,75 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <title>Upload to Drive</title>
+  <meta charset="UTF-8">
+  <title>Admin Upload</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    body{font-family:system-ui,Segoe UI,Arial;margin:20px}
+    input,button{padding:10px 14px;margin:6px 0}
+    #msg{margin-top:12px;font-weight:bold}
+  </style>
 </head>
 <body>
-
-<h2>Upload Video</h2>
-
-<input type="file" id="video">
-<button onclick="upload()">Upload</button>
-
-<p id="msg">Waiting...</p>
+  <h2>Upload Video / Image</h2>
+  <input type="file" id="fileInput" accept="video/*,image/*"><br>
+  <button id="uploadBtn">Upload</button>
+  <p id="msg">Progress: 0%</p>
 
 <script>
-function upload() {
-    const file = document.getElementById("video").files[0];
-    if (!file) return alert("Please select a video!");
+const webAppUrl = "https://script.google.com/macros/s/AKfycbxJVX7e46e8XOBQ0_ApPNR7SvC2zoAm9JG7zVi4pfaR8jfYz0U99lrx6ZW7jpTDH5V5rw/exec";
 
-    const formData = new FormData();
-    formData.append("file", file);
+const uploadBtn = document.getElementById("uploadBtn");
+const fileInput = document.getElementById("fileInput");
+const msg = document.getElementById("msg");
 
+uploadBtn.onclick = () => {
+  const file = fileInput.files[0];
+  if(!file) return alert("Select a file first!");
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    const base64 = reader.result.split(",")[1];
     const xhr = new XMLHttpRequest();
-    xhr.open("POST", "https://script.google.com/macros/s/AKfycbwO-cef9rbYGsyFW0HyN98senKLi-_bKK8qCpG1-R4zuZwcZDvr5Dbenh3SHTykjWo6/exec", true);
+    xhr.open("POST", webAppUrl, true);
+    xhr.setRequestHeader("Content-Type", file.type);
+    xhr.setRequestHeader("X-File-Name", file.name);
 
-    document.getElementById("msg").innerText = "Uploading... Please wait...";
-
-    xhr.onload = () => {
-        if (xhr.status === 200) {
-            document.getElementById("msg").innerText = "Upload Complete!";
-            console.log(xhr.responseText);
-        } else {
-            document.getElementById("msg").innerText = "Upload failed!";
-        }
+    xhr.upload.onprogress = (e) => {
+      if(e.lengthComputable){
+        const percent = Math.round((e.loaded / e.total) * 100);
+        msg.innerText = `Progress: ${percent}%`;
+      }
     };
 
-    xhr.send(formData);
-}
-</script>
+    xhr.onload = () => {
+      if(xhr.status === 200){
+        const res = xhr.responseText;
+        if(res.startsWith("SUCCESS")){
+          msg.innerText = "Upload Complete! ✅";
 
+          // Save file info in localStorage for gallery
+          const list = JSON.parse(localStorage.getItem('uploadedFiles') || "[]");
+          list.push({ name:file.name, time:Date.now() });
+          localStorage.setItem('uploadedFiles', JSON.stringify(list));
+
+        } else {
+          msg.innerText = "Upload failed: " + res;
+        }
+      } else {
+        msg.innerText = "Upload failed. Status: " + xhr.status;
+      }
+    };
+
+    xhr.onerror = () => {
+      msg.innerText = "Network error during upload.";
+    };
+
+    xhr.send(base64);
+  };
+
+  reader.readAsDataURL(file);
+};
+</script>
 </body>
 </html>
