@@ -2,57 +2,40 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Admin Upload with Progress</title>
+    <title>Upload to Drive</title>
 </head>
 <body>
 
-<h2>Upload Video to Google Drive</h2>
+<h2>Upload Video</h2>
 
 <input type="file" id="video">
 <button onclick="upload()">Upload</button>
 
-<p id="msg">Progress: 0%</p>
+<p id="msg">Waiting...</p>
 
 <script>
 function upload() {
     const file = document.getElementById("video").files[0];
-    if (!file) return alert("Please select a video first!");
+    if (!file) return alert("Please select a video!");
 
-    const reader = new FileReader();
-    reader.onload = () => {
-        const base64 = reader.result.split(",")[1];
+    const formData = new FormData();
+    formData.append("file", file);
 
-        const xhr = new XMLHttpRequest();
-        xhr.open("POST", "https://script.google.com/macros/s/AKfycbwO-cef9rbYGsyFW0HyN98senKLi-_bKK8qCpG1-R4zuZwcZDvr5Dbenh3SHTykjWo6/exec", true);
-        xhr.setRequestHeader("Content-Type", file.type);
-        xhr.setRequestHeader("X-File-Name", file.name);
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "https://script.google.com/macros/s/AKfycbwO-cef9rbYGsyFW0HyN98senKLi-_bKK8qCpG1-R4zuZwcZDvr5Dbenh3SHTykjWo6/exec", true);
 
-        // Progress Event
-        xhr.upload.addEventListener("progress", (e) => {
-            if (e.lengthComputable) {
-                const percent = Math.round((e.loaded / e.total) * 100);
-                document.getElementById("msg").innerText = `Progress: ${percent}%`;
-            }
-        });
+    document.getElementById("msg").innerText = "Uploading... Please wait...";
 
-        xhr.onload = () => {
-            if (xhr.status === 200) {
-                const url = xhr.responseText;
-                if (url.startsWith("ERROR")) {
-                    document.getElementById("msg").innerText = "Upload failed: " + url;
-                } else {
-                    localStorage.setItem("latestVideo", url);
-                    document.getElementById("msg").innerText = "Upload Complete! 100%";
-                }
-            } else {
-                document.getElementById("msg").innerText = "Upload failed. Status: " + xhr.status;
-            }
-        };
-
-        xhr.send(base64);
+    xhr.onload = () => {
+        if (xhr.status === 200) {
+            document.getElementById("msg").innerText = "Upload Complete!";
+            console.log(xhr.responseText);
+        } else {
+            document.getElementById("msg").innerText = "Upload failed!";
+        }
     };
 
-    reader.readAsDataURL(file);
+    xhr.send(formData);
 }
 </script>
 
