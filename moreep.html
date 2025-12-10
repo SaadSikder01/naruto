@@ -1,59 +1,32 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <title>Gallery — Saad</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body { font-family: Arial, sans-serif; margin:20px; }
-    .item { margin-bottom:20px; }
-    img, video { max-width: 640px; display:block; margin-bottom:6px; }
-    .meta { color: #666; font-size:0.9rem; }
-  </style>
-</head>
 <body>
-  <h2>Uploaded Files Gallery</h2>
-  <div id="container"></div>
+
+<h2>All Naruto Videos</h2>
+<div id="list"></div>
 
 <script>
-const container = document.getElementById('container');
-const list = JSON.parse(localStorage.getItem('uploadedFiles') || "[]");
+const API = "https://script.google.com/macros/s/AKfycby-6nFSZEvWKTLtfU80xX6sYAu4_YZ-r1vOOfGcNsXnRECWbnGQm7eCNt4F5gSYpz0/exec";  // ← এখানে Google Script এর exec URL বসাবে
 
-function driveViewUrl(id) {
-  return `https://drive.google.com/uc?export=view&id=${id}`;
+async function loadVideos() {
+    let res = await fetch(API);
+    let data = await res.json();
+
+    let box = document.getElementById("list");
+    box.innerHTML = "";
+
+    data.forEach(v => {
+        box.innerHTML += `
+            <div style="margin-bottom:20px">
+                <p><b>${v.name}</b></p>
+                <video width="350" controls src="${v.url}"></video>
+            </div>
+        `;
+    });
 }
 
-function humanTime(ts){
-  return new Date(ts).toLocaleString();
-}
-
-if(list.length===0){
-  container.innerHTML = "<p>No uploaded files yet.</p>";
-} else {
-  list.reverse().forEach(item=>{
-    const ext = item.name.split('.').pop().toLowerCase();
-    const wrapper = document.createElement('div');
-    wrapper.className = 'item';
-
-    if(['mp4','webm','ogg','ogv'].includes(ext)){
-      const v = document.createElement('video');
-      v.controls = true;
-      v.src = driveViewUrl(item.id);
-      wrapper.appendChild(v);
-    } else {
-      const img = document.createElement('img');
-      img.src = driveViewUrl(item.id);
-      wrapper.appendChild(img);
-    }
-
-    const meta = document.createElement('div');
-    meta.className = 'meta';
-    meta.innerText = `${item.name} — uploaded: ${humanTime(item.time)}`;
-    wrapper.appendChild(meta);
-
-    container.appendChild(wrapper);
-  });
-}
+loadVideos();
 </script>
+
 </body>
 </html>
