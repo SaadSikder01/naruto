@@ -14,24 +14,21 @@
 <div id="videoList">Loading videos...</div>
 
 <script>
-fetch("https://script.google.com/macros/s/AKfycbwTUkCOSWYvv_eR5joP5vlGINZpp1kBZxlceuEIG8BG_ftSynqiaS_Vik9sNAwdKucr/exec")
+fetch("https://script.google.com/macros/s/AKfycbx_AJ-LWtZy0vFeskkspTjrNrZGh6-5N2YphvNawVQhj_r1_kKnQn3aVThn6DgLuelpGA/exec")
   .then(res => res.json())
   .then(data => {
     let html = "";
     data.forEach(v => {
       html += `
         <h3>${v.name}</h3>
-        <video controls preload="metadata">
-          <source src="${v.url}" type="video/mp4">
-        </video>
+        <iframe src="${v.url}" width="350" height="200" allow="autoplay"></iframe>
       `;
     });
     document.getElementById("videoList").innerHTML = html;
-  })
-  .catch(err => {
-    document.getElementById("videoList").innerHTML = "Error loading videos.";
   });
 </script>
 
+
 </body>
 </html>
+
