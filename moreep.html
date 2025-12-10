@@ -1,31 +1,36 @@
 <!DOCTYPE html>
 <html>
+<head>
+  <meta charset="UTF-8">
+  <title>Naruto Videos</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    video { width: 95%; margin-bottom: 25px; border: 2px solid #444; border-radius: 10px; }
+  </style>
+</head>
 <body>
 
-<h2>All Naruto Videos</h2>
-<div id="list"></div>
+<h1>Naruto Video List</h1>
+<div id="videoList">Loading videos...</div>
 
 <script>
-const API = "https://script.google.com/macros/s/AKfycby-6nFSZEvWKTLtfU80xX6sYAu4_YZ-r1vOOfGcNsXnRECWbnGQm7eCNt4F5gSYpz0/exec";  // ← এখানে Google Script এর exec URL বসাবে
-
-async function loadVideos() {
-    let res = await fetch(API);
-    let data = await res.json();
-
-    let box = document.getElementById("list");
-    box.innerHTML = "";
-
+fetch("https://script.google.com/macros/s/AKfycbwTUkCOSWYvv_eR5joP5vlGINZpp1kBZxlceuEIG8BG_ftSynqiaS_Vik9sNAwdKucr/exec")
+  .then(res => res.json())
+  .then(data => {
+    let html = "";
     data.forEach(v => {
-        box.innerHTML += `
-            <div style="margin-bottom:20px">
-                <p><b>${v.name}</b></p>
-                <video width="350" controls src="${v.url}"></video>
-            </div>
-        `;
+      html += `
+        <h3>${v.name}</h3>
+        <video controls preload="metadata">
+          <source src="${v.url}" type="video/mp4">
+        </video>
+      `;
     });
-}
-
-loadVideos();
+    document.getElementById("videoList").innerHTML = html;
+  })
+  .catch(err => {
+    document.getElementById("videoList").innerHTML = "Error loading videos.";
+  });
 </script>
 
 </body>
