@@ -118,21 +118,26 @@ function toggleSound(){
 
 
 
-function saad(){
-const inpt = document.getElementById("input").value;
-if(inpt === "saad"){
-window.location.href = "second.html";
+async function saad(){
+    const input = document.getElementById("input").value.trim();
+    const apiURL = "https://script.google.com/macros/s/AKfycbwZ7vsFRGKf5K5UVFSmlHNDuu_svUiwq-7TGybxDIjx9bS5mixp7k0AdXrDTwxNfg-j/exec";
+
+    try {
+        let response = await fetch(apiURL);
+        let users = await response.json();
+
+        if(users.includes(input)){
+            window.location.href = "second.html";
+        } else {
+            alert("ইউজার খুজে পাওয়া যাচ্ছে না! দয়া করে সঠিক তথ্য দিয়ে লগইন করুন।");
+        }
+
+    } catch (error) {
+        alert("সার্ভারের সাথে সংযোগ করা যাচ্ছে না!");
+        console.error(error);
+    }
 }
-else if (inpt === "saad@saad"){
-window.location.href = "https://www.facebook.com/Username.SaadSikder";
-}
-else if(inpt === "babu vai"){
-	window.location.href = "second.html";
-}
-else{
-alert("ইউজার খুজে পাওয়া যাচ্ছে না! দয়া করে সঠিক তথ্য দিয়ে লগইন করুন।");
-}
-}
+
 </script>
 
 
@@ -144,3 +149,4 @@ alert("ইউজার খুজে পাওয়া যাচ্ছে না! �
 
 </body>
 </html>
+
