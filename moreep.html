@@ -7,11 +7,18 @@
   <style>
     body { font-family: Arial; padding: 20px; }
     video { width: 95%; margin-bottom: 25px; border: 2px solid #444; border-radius: 10px; }
+	.download{
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 1000;
+}
   </style>
 </head>
 <body>
 
 <h1 style = "text-align:center">Naruto</h1><hr><hr><br>
+<a href = "download.html" class = "download"><img src = "download-icon.png" style = "height:40px"></a>
 <div id="videoList">Loading videos...</div>
 
 <script>
@@ -32,7 +39,6 @@ fetch("https://script.google.com/macros/s/AKfycbx_AJ-LWtZy0vFeskkspTjrNrZGh6-5N2
 
 </body>
 </html>
-
 
 
 
