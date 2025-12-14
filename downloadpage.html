@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Naruto Shippuden</title>
+  <meta name = "viewport" content = "width=device-width, initile-scale = 1.0">
+  <style>
+    body { font-family: Arial; background:white; color:black; }
+    iframe { width:350; height:200; margin-bottom:20px; border:none; }
+  </style>
+</head>
+<body>
+
+<h2 style = "text-align:center">Naruto Shippuden</h2><hr><hr><br>
+<div id="videos"></div>
+
+<script>
+fetch("https://script.google.com/macros/s/AKfycbwfZovhjC0-P3Us_P97U7lwIoveoOu9KkOy9wnwgLV75P5qyTMRvR8NVi8Nqmj4WW3HFA/exec")
+.then(res => res.json())
+.then(data => {
+  const container = document.getElementById("videos");
+  data.forEach(v => {
+    container.innerHTML += `
+      <h4>${v.name}</h4>
+      <iframe src="${v.embed}" allow="autoplay"></iframe>
+    `;
+  });
+});
+</script>
+
+</body>
+</html>
