@@ -5,24 +5,49 @@
   <title>Admin Upload — Saad</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body { font-family: Arial, sans-serif; margin:20px; }
+    body { font-family: Arial, sans-serif; margin:20px; background:#006666 }
     input, button { padding:8px 12px; margin:6px 0; }
     #msg { margin-top:12px; }
+	.btn{
+	background:#ff3300;
+	border:0.5px solid black;<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Admin Upload — Saad</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: Arial, sans-serif; margin:20px; background:#006666 }
+    input, button { padding:8px 12px; margin:6px 0; }
+    #msg { margin-top:12px; }
+	.btn{
+	background:#ff3300;
+	border:0.5px solid black;
+	border-radius:17px;
+	height:40px;
+	width:150px;
+	font-weight:bold;
+	}
   </style>
 </head>
 <body>
-  <h2>Upload Video / Image to Google Drive</h2>
+  <h2 style = "text-align:center; background:red">Upload Video</h2>
   <input type="file" id="fileInput" accept="video/*,image/*"><br>
   <button id="uploadBtn">Upload</button>
-  <p id="msg">Progress: 0%</p>
-
+  <p id="msg">Progress: 0%</p><br><br>
+  
+  <h1 style = "text-align:center; background:#0066ff">IF FACING ANY ISSU, TRY ANOTHER WAY</h1><br><br>
+<div style = "text-align:center">  <button class = "btn" onclick = "btn()">upload video</button>
+</div>
 <script>
 const uploadBtn = document.getElementById('uploadBtn');
 const fileInput = document.getElementById('fileInput');
 const msg = document.getElementById('msg');
 
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxJVX7e46e8XOBQ0_ApPNR7SvC2zoAm9JG7zVi4pfaR8jfYz0U99lrx6ZW7jpTDH5V5rw/exec";
-
+function btn(){
+window.location.href = "https://drive.google.com/drive/u/0/my-drive";
+}
 uploadBtn.addEventListener('click', () => {
   const file = fileInput.files[0];
   if(!file) return alert("Please select a file first!");
@@ -63,3 +88,67 @@ uploadBtn.addEventListener('click', () => {
 </body>
 </html>
 
+	border-radius:17px;
+	height:40px;
+	width:150px;
+	font-weight:bold;
+	}
+  </style>
+</head>
+<body>
+  <h2 style = "text-align:center; background:red">Upload Video</h2>
+  <input type="file" id="fileInput" accept="video/*,image/*"><br>
+  <button id="uploadBtn">Upload</button>
+  <p id="msg">Progress: 0%</p><br><br>
+  
+  <h1 style = "text-align:center; background:#0066ff">IF FACING ANY ISSU, TRY ANOTHER WAY</h1><br><br>
+<div style = "text-align:center">  <button class = "btn" onclick = "btn()">upload video</button>
+</div>
+<script>
+const uploadBtn = document.getElementById('uploadBtn');
+const fileInput = document.getElementById('fileInput');
+const msg = document.getElementById('msg');
+
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxJVX7e46e8XOBQ0_ApPNR7SvC2zoAm9JG7zVi4pfaR8jfYz0U99lrx6ZW7jpTDH5V5rw/exec";
+function btn(){
+window.location.href = "https://drive.google.com/drive/u/0/my-drive";
+}
+uploadBtn.addEventListener('click', () => {
+  const file = fileInput.files[0];
+  if(!file) return alert("Please select a file first!");
+
+  msg.innerText = "Starting upload...";
+
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const xhr = new XMLHttpRequest();
+  xhr.open('POST', WEB_APP_URL, true);
+
+  xhr.upload.onprogress = (e) => {
+    if(e.lengthComputable){
+      const percent = Math.round((e.loaded / e.total) * 100);
+      msg.innerText = `Progress: ${percent}%`;
+    }
+  };
+
+  xhr.onload = () => {
+    if(xhr.status === 200){
+      msg.innerText = "Upload complete!";
+      // Save file info to localStorage for gallery
+      const list = JSON.parse(localStorage.getItem('uploadedFiles') || "[]");
+      const data = JSON.parse(xhr.responseText);
+      list.push({name: file.name, id: data.id, time: Date.now()});
+      localStorage.setItem('uploadedFiles', JSON.stringify(list));
+    } else {
+      msg.innerText = "Upload failed. Status: " + xhr.status;
+    }
+  };
+
+  xhr.onerror = () => { msg.innerText = "Network error during upload."; }
+
+  xhr.send(formData);
+});
+</script>
+</body>
+</html>
