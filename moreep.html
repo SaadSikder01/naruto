@@ -13,15 +13,22 @@
     right: 10px;
     z-index: 1000;
 }
+	  .icon{
+    position: fixed;
+    top: ;
+    right: ;
+    z-index:1100 ;
   </style>
 </head>
 <body>
 
 <h1 style = "text-align:center">Naruto</h1><hr><hr><br>
+<a href = "naruto.html" class = "icon"><img src = "icon1.png" style = "height:40px"></a>
 <a href = "download.html" class = "download"><img src = "download-icon.png" style = "height:40px"></a>
 <div id="videoList">Loading videos...</div>
 
 <script>
+alert("ভিডিও লোড হতে সময় লাগতে পারে, ভিডিও পেতে কিছুক্ষন অপেক্ষা করুন।")
 fetch("https://script.google.com/macros/s/AKfycbx_AJ-LWtZy0vFeskkspTjrNrZGh6-5N2YphvNawVQhj_r1_kKnQn3aVThn6DgLuelpGA/exec")
   .then(res => res.json())
   .then(data => {
@@ -39,6 +46,7 @@ fetch("https://script.google.com/macros/s/AKfycbx_AJ-LWtZy0vFeskkspTjrNrZGh6-5N2
 
 </body>
 </html>
+
 
 
 
