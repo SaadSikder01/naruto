@@ -151,10 +151,24 @@ body, html {
 </div>
 	<script src="https://cdn.commoninja.com/sdk/latest/commonninja.js" defer></script>
 <div class="commonninja_component pid-7ddb6c78-e71a-4797-b8dc-8ab31985f140"></div>
-<script>
+<script src="https://cdn.commoninja.com/sdk/latest/commonninja.js" defer></script>
+<div class="commonninja_component pid-7ddb6c78-e71a-4797-b8dc-8ab31985f140"></div>
 
-
 <script>
+function toggleSound() {
+    // তোমার সাউন্ড টগল ফাংশনটা যদি থাকে তাহলে এখানে যোগ করো
+    // (তোমার আগের কোডে এটা দেখিনি, যোগ করে নাও)
+    let music = document.getElementById("bgMusic");
+    let btn = document.getElementById("soundBtn");
+    if (music.muted) {
+        music.muted = false;
+        btn.innerHTML = "🔊";
+    } else {
+        music.muted = true;
+        btn.innerHTML = "🔇";
+    }
+}
+
 async function saad(){
     const input = document.getElementById("input").value.trim();
     const loader = document.getElementById("loader");
@@ -165,7 +179,7 @@ async function saad(){
         return;
     }
 
-    loader.style.display = "flex"; // 🔥 loader show
+    loader.style.display = "flex"; // লোডার দেখাবে
 
     try {
         let response = await fetch(apiURL);
@@ -178,12 +192,12 @@ async function saad(){
             window.location.href = "https://www.facebook.com/Username.SaadSikder";
         }
         else {
-            loader.style.display = "none"; // ❌ ভুল হলে loader hide
+            loader.style.display = "none";
             alert("ইউজার খুজে পাওয়া যাচ্ছে না! দয়া করে সঠিক তথ্য দিয়ে লগইন করুন।");
         }
 
     } catch (error) {
-        loader.style.display = "none"; // ❌ error হলে hide
+        loader.style.display = "none";
         alert("সার্ভারের সাথে সংযোগ করা যাচ্ছে না!");
         console.error(error);
     }
@@ -200,6 +214,7 @@ async function saad(){
 
 </body>
 </html>
+
 
 
 
