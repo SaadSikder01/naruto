@@ -1,62 +1,67 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Private Drive Uploader</title>
+    <title>Drive Uploader</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; width: 350px; }
-        input[type="file"] { margin: 20px 0; border: 1px solid #ddd; padding: 10px; width: 100%; border-radius: 5px; }
-        button { background: #1877f2; color: white; border: none; padding: 12px; width: 100%; border-radius: 6px; cursor: pointer; font-size: 16px; }
-        button:disabled { background: #90bcff; }
-        #status { margin-top: 15px; font-size: 14px; color: #555; }
+        body { font-family: sans-serif; background: #f4f4f4; text-align: center; padding: 50px; }
+        .box { background: white; padding: 30px; border-radius: 10px; display: inline-block; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        button { background: #28a745; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 5px; margin-top: 10px; }
+        button:disabled { background: #ccc; }
+        #msg { margin-top: 15px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>Drive Uploader</h2>
-    <input type="file" id="fileInput">
-    <button id="uploadBtn" onclick="upload()">Upload to Drive</button>
-    <div id="status">Ready to upload</div>
+<div class="box">
+    <h2>গুগল ড্রাইভ আপলোডার</h2>
+    <input type="file" id="fileInput"><br>
+    <button id="btn" onclick="uploadFile()">আপলোড করুন</button>
+    <div id="msg">ফাইল সিলেক্ট করুন</div>
 </div>
 
 <script>
-    // আপনার Google Web App URL টি এখানে দিন
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyY21Xd9iaYxV2UV1pH-olwKmrACHeRabGO6-ITl71Tg2PB_-offogPHoO65zuC7PHd/exec";
+    // আপনার প্রাপ্ত Web App URL টি এখানে বসান
+    const scriptURL = "https://script.google.com/macros/s/AKfycbz9muMhRPxzxPiTVUiGWZPkePcJafY896tyLV9tZS_tdYec9YHenitjk23bIakBAJ2izg/exec";
 
-    async function upload() {
+    function uploadFile() {
         const fileInput = document.getElementById('fileInput');
-        const status = document.getElementById('status');
-        const btn = document.getElementById('uploadBtn');
+        const btn = document.getElementById('btn');
+        const msg = document.getElementById('msg');
 
-        if (fileInput.files.length === 0) return alert("Select a file first!");
+        if (fileInput.files.length === 0) return alert("ফাইল সিলেক্ট করুন!");
 
         const file = fileInput.files[0];
         const reader = new FileReader();
 
-        status.innerText = "Uploading... Please wait.";
+        msg.innerText = "আপলোড হচ্ছে... অপেক্ষা করুন।";
         btn.disabled = true;
 
-        reader.onload = function(e) {
-            const base64Data = e.target.result;
+        reader.onload = function() {
+            // শুধুমাত্র Base64 অংশটুকু নেওয়া
+            const base64String = reader.result.split(',')[1];
             
-            // GitHub থেকে Apps Script-এ ডেটা পাঠানো
-            fetch(WEB_APP_URL, {
+            const payload = {
+                base64: base64String,
+                type: file.type,
+                name: file.name
+            };
+
+            fetch(scriptURL, {
                 method: "POST",
-                mode: "no-cors", // এটি গুরুত্বপূর্ণ
-                body: JSON.stringify({
-                    data: base64Data,
-                    name: file.name
-                })
-            }).then(() => {
-                status.innerText = "Sent! Check your Google Drive.";
-                status.style.color = "green";
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.text())
+            .then(data => {
+                msg.innerText = data;
+                msg.style.color = "green";
                 btn.disabled = false;
                 fileInput.value = "";
-            }).catch(err => {
-                status.innerText = "Error: " + err;
+            })
+            .catch(err => {
+                msg.innerText = "ভুল হয়েছে! আবার চেষ্টা করুন।";
+                msg.style.color = "red";
                 btn.disabled = false;
             });
         };
