@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Sheet Logger</title>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f0f4f8; margin: 0; }
+        .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; }
+        input { padding: 10px; width: 200px; border: 1px solid #ccc; border-radius: 5px; outline: none; }
+        button { padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; margin-left: 5px; }
+        button:disabled { background: #ccc; }
+        #status { margin-top: 15px; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>শিটে নাম যোগ করুন</h2>
+    <input type="text" id="userName" placeholder="আপনার নাম লিখুন">
+    <button id="addBtn" onclick="sendToSheet()">Add</button>
+    <div id="status"></div>
+</div>
+
+<script>
+    // আপনার Web App URL টি এখানে দিন
+    const scriptURL = "আপনার_WEB_APP_URL_এখানে_দিন";
+
+    function sendToSheet() {
+        const nameInput = document.getElementById('userName');
+        const status = document.getElementById('status');
+        const btn = document.getElementById('addBtn');
+        const name = nameInput.value.trim();
+
+        if (!name) {
+            alert("দয়া করে একটি নাম লিখুন!");
+            return;
+        }
+
+        status.innerText = "শিটে পাঠানো হচ্ছে...";
+        status.style.color = "blue";
+        btn.disabled = true;
+
+        fetch(scriptURL, {
+            method: "POST",
+            body: JSON.stringify({ name: name })
+        })
+        .then(res => res.text())
+        .then(data => {
+            status.innerText = data;
+            status.style.color = "green";
+            btn.disabled = false;
+            nameInput.value = ""; // ইনপুট ক্লিয়ার করা
+        })
+        .catch(err => {
+            status.innerText = "ব্যর্থ হয়েছে! আবার চেষ্টা করুন।";
+            status.style.color = "red";
+            btn.disabled = false;
+        });
+    }
+</script>
+
+</body>
+</html>
