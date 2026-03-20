@@ -3,34 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>গুগল শিট লগার</title>
+    <title>গুগল শিট ডাটা এন্ট্রি</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f4f7f6; margin: 0; }
-        .box { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; width: 350px; }
-        input { padding: 12px; width: 85%; border: 2px solid #ddd; border-radius: 6px; margin-bottom: 20px; font-size: 16px; outline: none; }
-        input:focus { border-color: #007bff; }
-        button { background: #007bff; color: white; border: none; padding: 12px; width: 93%; border-radius: 6px; cursor: pointer; font-size: 16px; transition: 0.3s; }
-        button:hover { background: #0056b3; }
+        /* ডিজাইন অংশ */
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            background-color: #f0f2f5; 
+            margin: 0; 
+        }
+        .container { 
+            background: white; 
+            padding: 40px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08); 
+            text-align: center; 
+            width: 350px; 
+        }
+        h2 { color: #1DB954; margin-bottom: 25px; }
+        input { 
+            padding: 12px; 
+            width: 90%; 
+            border: 2px solid #ddd; 
+            border-radius: 8px; 
+            font-size: 16px; 
+            margin-bottom: 20px; 
+            outline: none; 
+            transition: 0.3s;
+        }
+        input:focus { border-color: #1DB954; }
+        button { 
+            padding: 12px 25px; 
+            background: #1DB954; 
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            font-weight: bold; 
+            width: 100%; 
+            transition: 0.3s; 
+        }
+        button:hover { background: #1aa34a; }
         button:disabled { background: #ccc; cursor: not-allowed; }
-        #msg { margin-top: 15px; font-size: 14px; color: #555; }
+        #status { margin-top: 20px; font-size: 14px; min-height: 20px; }
     </style>
 </head>
 <body>
 
-<div class="box">
-    <h2>শিটে নাম যোগ করুন</h2>
-    <input type="text" id="userName" placeholder="এখানে নাম লিখুন">
-    <button id="addBtn" onclick="sendData()">Add Name</button>
-    <p id="msg"></p>
+<div class="container">
+    <h2>শিট লগার</h2>
+    <input type="text" id="userName" placeholder="আপনার নাম লিখুন...">
+    <button id="addBtn" onclick="sendToSheet()">শিটে যোগ করুন</button>
+    <div id="status">নাম লিখে বাটনে ক্লিক করুন</div>
 </div>
 
 <script>
-    // আপনার প্রাপ্ত Web App URL টি নিচের ইনভার্টেড কমার ভেতরে বসান
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyW5rGAXU2JIG9C-7-AgAUEIgyJrRwgbxsACts5518TMXM9ndMSJlmWsNUq7xQqiQ4Pcg/exec";
+    // আপনার প্রাপ্ত Google Web App URL টি এখানে বসান
+    const scriptURL = "https://script.google.com/macros/s/AKfycbwqNbmU6POfXBjh1Ma2h5pyjNVrrbpc4fSiUCOExK7xwVsb2JdK8-2ClflmzUmVWOkf/exec";
 
-    function sendData() {
+    function sendToSheet() {
         const nameInput = document.getElementById('userName');
-        const msg = document.getElementById('msg');
+        const status = document.getElementById('status');
         const btn = document.getElementById('addBtn');
         const name = nameInput.value.trim();
 
@@ -39,33 +76,37 @@
             return;
         }
 
-        msg.innerText = "শিটে পাঠানো হচ্ছে...";
-        msg.style.color = "blue";
+        // লোডিং মেসেজ
+        status.innerText = "শিটে পাঠানো হচ্ছে...";
+        status.style.color = "blue";
         btn.disabled = true;
 
-        fetch(SCRIPT_URL, {
+        // ডেটা পাঠানো
+        fetch(scriptURL, {
             method: "POST",
             body: JSON.stringify({ name: name }),
-            headers: { "Content-Type": "text/plain;charset=utf-8" }
+            headers: {
+                "Content-Type": "text/plain;charset=utf-8"
+            }
         })
-        .then(response => response.json())
-        .then(result => {
-            if (result.status === "success") {
-                msg.innerText = "সফলভাবে শিটে জমা হয়েছে!";
-                msg.style.color = "green";
-                nameInput.value = ""; 
+        .then(res => res.json())
+        .then(data => {
+            if(data.status === "success") {
+                status.innerText = "সফলভাবে শিটে জমা হয়েছে!";
+                status.style.color = "green";
+                nameInput.value = ""; // ক্লিয়ার করা
             } else {
-                msg.innerText = "সার্ভার এরর: " + result.message;
-                msg.style.color = "red";
+                status.innerText = "সার্ভার এরর: " + data.message;
+                status.style.color = "red";
             }
             btn.disabled = false;
         })
-        .catch(error => {
-            // অনেক সময় রিডাইরেক্টের কারণে এরর দেখালেও ডাটা শিটে জমা হয়
-            msg.innerText = "রিকোয়েস্ট পাঠানো হয়েছে। শিট চেক করুন!";
-            msg.style.color = "orange";
+        .catch(err => {
+            // অনেক সময় রিডাইরেক্টের কারণে এরর আসলেও ডাটা জমা হয়
+            status.innerText = "ডাটা পাঠানো হয়েছে (শিট চেক করুন)";
+            status.style.color = "orange";
             btn.disabled = false;
-            console.error('Error!', error.message);
+            console.error(err);
         });
     }
 </script>
