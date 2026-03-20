@@ -1,44 +1,67 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <base target="_top">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Private Drive Uploader</title>
     <style>
-      body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
-      .upload-btn { padding: 10px 20px; background: #4285F4; color: white; border: none; cursor: pointer; }
-      #msg { margin-top: 20px; color: green; font-weight: bold; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; width: 350px; }
+        input[type="file"] { margin: 20px 0; border: 1px solid #ddd; padding: 10px; width: 100%; border-radius: 5px; }
+        button { background: #1877f2; color: white; border: none; padding: 12px; width: 100%; border-radius: 6px; cursor: pointer; font-size: 16px; }
+        button:disabled { background: #90bcff; }
+        #status { margin-top: 15px; font-size: 14px; color: #555; }
     </style>
-  </head>
-  <body>
-    <h2>আমার পার্সোনাল ড্রাইভ আপলোডার</h2>
-    <input type="file" id="file" accept="image/*,video/*">
-    <br><br>
-    <button class="upload-btn" onclick="upload()">ড্রাইভে পাঠান</button>
-    <p id="msg"></p>
+</head>
+<body>
 
-    <script>
-      function upload() {
-        var fileInput = document.getElementById('file');
-        if (fileInput.files.length === 0) {
-          alert("দয়া করে একটি ফাইল সিলেক্ট করুন!");
-          return;
-        }
+<div class="container">
+    <h2>Drive Uploader</h2>
+    <input type="file" id="fileInput">
+    <button id="uploadBtn" onclick="upload()">Upload to Drive</button>
+    <div id="status">Ready to upload</div>
+</div>
 
-        var file = fileInput.files[0];
-        var msg = document.getElementById('msg');
-        msg.innerHTML = "আপলোড হচ্ছে, দয়া করে অপেক্ষা করুন...";
-        msg.style.color = "blue";
+<script>
+    // আপনার Google Web App URL টি এখানে দিন
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzgZXqVC8TaXrqhlS1OdQuVwSk9UAASDM1_5yPtENvOfhwZ9_wNWt4TIVeDGWOkqyQB3g/exec";
 
-        var reader = new FileReader();
+    async function upload() {
+        const fileInput = document.getElementById('fileInput');
+        const status = document.getElementById('status');
+        const btn = document.getElementById('uploadBtn');
+
+        if (fileInput.files.length === 0) return alert("Select a file first!");
+
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+
+        status.innerText = "Uploading... Please wait.";
+        btn.disabled = true;
+
         reader.onload = function(e) {
-          var data = e.target.result;
-          google.script.run.withSuccessHandler(function(res) {
-            msg.innerHTML = res;
-            msg.style.color = "green";
-            fileInput.value = ''; // ক্লিয়ার করে দেওয়া
-          }).uploadFile(data, file.name);
+            const base64Data = e.target.result;
+            
+            // GitHub থেকে Apps Script-এ ডেটা পাঠানো
+            fetch(WEB_APP_URL, {
+                method: "POST",
+                mode: "no-cors", // এটি গুরুত্বপূর্ণ
+                body: JSON.stringify({
+                    data: base64Data,
+                    name: file.name
+                })
+            }).then(() => {
+                status.innerText = "Sent! Check your Google Drive.";
+                status.style.color = "green";
+                btn.disabled = false;
+                fileInput.value = "";
+            }).catch(err => {
+                status.innerText = "Error: " + err;
+                btn.disabled = false;
+            });
         };
         reader.readAsDataURL(file);
-      }
-    </script>
-  </body>
+    }
+</script>
+</body>
 </html>
